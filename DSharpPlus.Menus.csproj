@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="DSharpPlus" Version="4.1.0-nightly-00919" />
+      <PackageReference Include="DSharpPlus.CommandsNext" Version="4.1.0-nightly-00919" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+    </ItemGroup>
+</Project>
