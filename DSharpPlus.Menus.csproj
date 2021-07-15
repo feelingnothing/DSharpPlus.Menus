@@ -3,6 +3,9 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <PackageId>DSharpPlus</PackageId>
+        <Version>0.0.0.1-dev</Version>
+        <RepositoryUrl>https://github.com/feelingnothing/DSharpPlus.Menus</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
