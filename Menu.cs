@@ -47,7 +47,7 @@ namespace DSharpPlus.Menus
                 if (parameter.ParameterType != typeof(InteractionCreateEventArgs) || method.ReturnType != typeof(Task)) continue;
                 var attr = method.GetCustomAttribute<ButtonAttribute>(true);
                 if (attr is null) continue;
-                Buttons.Add(new Button(attr.Id, attr.Style, method.CreateDelegate<Delegate>(), attr.Label, attr.Disabled, attr.Emoji));
+                Buttons.Add(new Button(attr.Id, attr.Style, method.CreateDelegate<Delegate>(), attr.Label, attr.Disabled));
             }
 
             if (Buttons.Count == 0) return Task.CompletedTask;
