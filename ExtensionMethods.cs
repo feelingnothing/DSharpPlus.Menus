@@ -4,7 +4,7 @@
     {
         public static MenusExtension UseMenus(this DiscordClient client, MenusConfiguration configuration)
         {
-            var ext = new MenusExtension(client, configuration);
+            var ext = new MenusExtension(configuration);
             client.AddExtension(ext);
             return ext;
         }

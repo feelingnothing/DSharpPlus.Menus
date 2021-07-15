@@ -9,13 +9,11 @@ namespace DSharpPlus.Menus
     public class MenusExtension : BaseExtension
     {
         public MenusConfiguration Configuration { get; }
-        private DiscordClient Client { get; }
 
         internal static readonly ConcurrentDictionary<Guid, Menu> PendingMenus = new();
 
-        internal MenusExtension(DiscordClient client, MenusConfiguration configuration)
+        internal MenusExtension(MenusConfiguration configuration)
         {
-            Client = client;
             Configuration = configuration;
         }
 
