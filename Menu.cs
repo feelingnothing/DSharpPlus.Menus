@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
-using DSharpPlus.EventArgs;
 using DSharpPlus.Menus.Attributes;
 
 namespace DSharpPlus.Menus
@@ -44,10 +44,13 @@ namespace DSharpPlus.Menus
                 var parameters = method.GetParameters();
                 if (parameters.Length is > 1 or 0) continue;
                 var parameter = parameters.First();
-                if (parameter.ParameterType != typeof(InteractionCreateEventArgs) || method.ReturnType != typeof(Task)) continue;
+                if (parameter.ParameterType != typeof(DiscordInteraction) || method.ReturnType != typeof(Task)) continue;
                 var attr = method.GetCustomAttribute<ButtonAttribute>(true);
                 if (attr is null) continue;
-                Buttons.Add(new Button(attr.Id, attr.Style, method.CreateDelegate<Delegate>(), attr.Label, attr.Disabled));
+                var instns = Expression.Parameter(GetType(), "instance");
+                var prms = new[] {instns, Expression.Parameter(typeof(DiscordInteraction), "interaction")};
+                var ec = Expression.Call(Expression.Parameter(GetType(), "instance"), method, prms.Skip(1));
+                Buttons.Add(new Button(attr.Id, attr.Style, Expression.Lambda(ec, prms).Compile(), attr.Label, attr.Disabled));
             }
 
             if (Buttons.Count == 0) return Task.CompletedTask;
