@@ -3,9 +3,11 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <Title>DSharpPlus Menus Extension</Title>
         <PackageId>DSharpPlus</PackageId>
         <Version>0.0.0.1-dev</Version>
         <RepositoryUrl>https://github.com/feelingnothing/DSharpPlus.Menus</RepositoryUrl>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
