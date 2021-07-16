@@ -29,7 +29,7 @@ namespace DSharpPlus.Menus
             var buttonId = Guid.Parse(response[38..]);
             if (!PendingMenus.TryGetValue(menuId, out var menu)) return Task.CompletedTask;
             if (menu.Buttons.FirstOrDefault(b => b.Id == buttonId) is not { } button) return Task.CompletedTask;
-            button.Callable.DynamicInvoke(args);
+            Task.Run(async () => await button.Callable(args.Interaction));
             return Task.CompletedTask;
         }
     }

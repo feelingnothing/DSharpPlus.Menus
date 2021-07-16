@@ -6,12 +6,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
 using DSharpPlus.Menus.Attributes;
+using Microsoft.VisualBasic;
 
 namespace DSharpPlus.Menus
 {
     internal class Button
     {
-        public Button(Guid id, ButtonStyle style, Delegate callable, string content, bool disabled = false, DiscordComponentEmoji? emoji = null)
+        public Button(Guid id, ButtonStyle style, Func<DiscordInteraction, Task> callable, string content, bool disabled = false, DiscordComponentEmoji? emoji = null)
         {
             Id = id;
             Style = style;
@@ -23,7 +24,7 @@ namespace DSharpPlus.Menus
 
         public Guid Id { get; }
         public ButtonStyle Style { get; }
-        public Delegate Callable { get; }
+        public Func<DiscordInteraction, Task> Callable { get; }
         public string Content { get; }
         public bool Disabled { get; }
         public DiscordComponentEmoji? Emoji { get; }
@@ -47,10 +48,10 @@ namespace DSharpPlus.Menus
                 if (parameter.ParameterType != typeof(DiscordInteraction) || method.ReturnType != typeof(Task)) continue;
                 var attr = method.GetCustomAttribute<ButtonAttribute>(true);
                 if (attr is null) continue;
-                var instns = Expression.Parameter(GetType(), "instance");
-                var prms = new[] {instns, Expression.Parameter(typeof(DiscordInteraction), "interaction")};
-                var ec = Expression.Call(Expression.Parameter(GetType(), "instance"), method, prms.Skip(1));
-                Buttons.Add(new Button(attr.Id, attr.Style, Expression.Lambda(ec, prms).Compile(), attr.Label, attr.Disabled));
+                var instance = Expression.Parameter(GetType(), "instance");
+                var interaction = Expression.Parameter(typeof(DiscordInteraction), "interaction");
+                var call = Expression.Call(instance, method, interaction);
+                Buttons.Add(new Button(attr.Id, attr.Style, method.CreateDelegate<Func<DiscordInteraction, Task>>(this), attr.Label, attr.Disabled));
             }
 
             if (Buttons.Count == 0) return Task.CompletedTask;
