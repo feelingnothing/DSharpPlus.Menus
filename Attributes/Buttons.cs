@@ -6,7 +6,6 @@ namespace DSharpPlus.Menus.Attributes
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class ButtonAttribute : Attribute
     {
-        internal Guid Id = Guid.NewGuid();
         public ButtonStyle Style { get; }
         public string Label { get; }
         public int Row { get; }

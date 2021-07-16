@@ -10,9 +10,8 @@ namespace DSharpPlus.Menus
 {
     internal class Button
     {
-        public Button(Guid id, ButtonStyle style, Func<DiscordInteraction, Task> callable, string content, int row = 0, bool disabled = false, DiscordComponentEmoji? emoji = null)
+        public Button(ButtonStyle style, Func<DiscordInteraction, Task> callable, string content, int row = 0, bool disabled = false, DiscordComponentEmoji? emoji = null)
         {
-            Id = id;
             Style = style;
             Callable = callable;
             Content = content;
@@ -21,7 +20,7 @@ namespace DSharpPlus.Menus
             Emoji = emoji;
         }
 
-        public Guid Id { get; }
+        public Guid Id { get; } = Guid.NewGuid();
         public ButtonStyle Style { get; }
         public Func<DiscordInteraction, Task> Callable { get; }
         public string Content { get; }
@@ -49,7 +48,7 @@ namespace DSharpPlus.Menus
                 if (parameter.ParameterType != typeof(DiscordInteraction) || method.ReturnType != typeof(Task)) continue;
                 var attr = method.GetCustomAttribute<ButtonAttribute>(true);
                 if (attr is null) continue;
-                Buttons.Add(new Button(attr.Id, attr.Style, method.CreateDelegate<Func<DiscordInteraction, Task>>(this),
+                Buttons.Add(new Button(attr.Style, method.CreateDelegate<Func<DiscordInteraction, Task>>(this),
                     attr.Label, attr.Row, attr.Disabled, attr.Emoji));
             }
         }
