@@ -35,10 +35,10 @@ namespace DSharpPlus.Menus
         private readonly Guid id = Guid.NewGuid();
         internal readonly List<Button> Buttons = new();
         public DiscordClient Client { get; }
-        public Menu(DiscordClient client) => Client = client;
 
-        public virtual Task StartAsync()
+        public Menu(DiscordClient client)
         {
+            Client = client;
             foreach (var method in GetType().GetMethods())
             {
                 if (!method.IsPublic || method.IsStatic || method.IsAbstract) continue;
@@ -48,19 +48,18 @@ namespace DSharpPlus.Menus
                 if (parameter.ParameterType != typeof(DiscordInteraction) || method.ReturnType != typeof(Task)) continue;
                 var attr = method.GetCustomAttribute<ButtonAttribute>(true);
                 if (attr is null) continue;
-                var instance = Expression.Parameter(GetType(), "instance");
-                var interaction = Expression.Parameter(typeof(DiscordInteraction), "interaction");
-                var call = Expression.Call(instance, method, interaction);
                 Buttons.Add(new Button(attr.Id, attr.Style, method.CreateDelegate<Func<DiscordInteraction, Task>>(this), attr.Label, attr.Disabled));
             }
+        }
 
-            if (Buttons.Count == 0) return Task.CompletedTask;
+        public virtual Task StartAsync()
+        {
             MenusExtension.PendingMenus[id] = this;
             return Task.CompletedTask;
         }
 
-        internal DiscordMessageBuilder Serialize() => new DiscordMessageBuilder().AddComponents(new DiscordActionRowComponent(
-            Buttons.Select(b => new DiscordButtonComponent(b.Style, $"{id:B}{b.Id:B}", b.Content, b.Disabled, b.Emoji))));
+        public DiscordMessageBuilder Serialize() => new DiscordMessageBuilder().AddComponents(
+            Buttons.Select(b => new DiscordButtonComponent(b.Style, $"{id:B}{b.Id:B}", b.Content, b.Disabled, b.Emoji)));
 
         public virtual Task StopAsync()
         {
