@@ -29,7 +29,7 @@ namespace DSharpPlus.Menus
         public DiscordComponentEmoji? Emoji { get; }
     }
 
-    public class Menu
+    public abstract class Menu
     {
         private readonly Guid id = Guid.NewGuid();
         internal readonly List<Button> Buttons = new();
