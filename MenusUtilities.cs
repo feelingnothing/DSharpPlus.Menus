@@ -1,15 +1,13 @@
-﻿using System.Threading.Tasks;
-using DSharpPlus.CommandsNext;
+﻿using DSharpPlus.Entities;
 
 namespace DSharpPlus.Menus
 {
     public static class MenusUtilities
     {
-        public static async Task RespondWithMenuAsync(this CommandContext ctx, Menu menu, string? content = null)
+        public static DiscordMessageBuilder AddMenu(this DiscordMessageBuilder builder, Menu menu)
         {
-            await menu.StartAsync();
-            var builder = menu.Serialize().WithContent(content);
-            await ctx.RespondAsync(builder);
+            builder.AddComponents(menu.Serialize());
+            return builder;
         }
     }
 }
