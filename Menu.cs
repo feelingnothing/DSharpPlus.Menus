@@ -48,7 +48,7 @@ namespace DSharpPlus.Menus
                 if (parameters.Length is > 1 or 0) continue;
                 var parameter = parameters.First();
                 if (parameter.ParameterType != typeof(DiscordInteraction) || method.ReturnType != typeof(Task)) continue;
-                var attr = method.GetCustomAttribute<ButtonAttribute>(true);
+                var attr = method.GetCustomAttribute<ButtonAttribute>(false);
                 if (attr is null) continue;
                 Buttons.Add(new Button(attr.Style, method.CreateDelegate<Func<DiscordInteraction, Task>>(this),
                     attr.Label, attr.Row, attr.Disabled, attr.Emoji));
