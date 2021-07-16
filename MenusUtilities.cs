@@ -9,5 +9,11 @@ namespace DSharpPlus.Menus
             builder.AddComponents(menu.Serialize());
             return builder;
         }
+
+        public static DiscordFollowupMessageBuilder AddMenu(this DiscordFollowupMessageBuilder builder, Menu menu)
+        {
+            builder.AddComponents(menu.Serialize());
+            return builder;
+        }
     }
 }
