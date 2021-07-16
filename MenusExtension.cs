@@ -12,25 +12,38 @@ namespace DSharpPlus.Menus
 
         internal static readonly ConcurrentDictionary<Guid, Menu> PendingMenus = new();
 
-        internal MenusExtension(MenusConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        public MenusExtension(MenusConfiguration configuration) => Configuration = configuration;
 
         protected override void Setup(DiscordClient client)
         {
-            client.ComponentInteractionCreated += HandleMenuInteraction;
+            Client = client;
+            Client.ComponentInteractionCreated += HandleMenuInteraction;
         }
 
-        private Task HandleMenuInteraction(DiscordClient sender, ComponentInteractionCreateEventArgs args)
+        private async Task HandleMenuInteraction(DiscordClient sender, ComponentInteractionCreateEventArgs args)
         {
-            ReadOnlySpan<char> response = args.Id.ToCharArray();
-            var menuId = Guid.Parse(response[..38]);
-            var buttonId = Guid.Parse(response[38..]);
-            if (!PendingMenus.TryGetValue(menuId, out var menu)) return Task.CompletedTask;
-            if (menu.Buttons.FirstOrDefault(b => b.Id == buttonId) is not { } button) return Task.CompletedTask;
-            Task.Run(async () => await button.Callable(args.Interaction));
-            return Task.CompletedTask;
+            var prefix = Configuration.ComponentPrefix;
+            string[] ids = args.Id.Split(' ');
+            if (ids.Length != 3 || ids[0] != prefix) return;
+
+            Guid menuId;
+            Guid buttonId;
+            try
+            {
+                menuId = Guid.Parse(ids[1]);
+                buttonId = Guid.Parse(ids[2]);
+            }
+            catch (FormatException)
+            {
+                if (!Configuration.DisableParseFailureWarnings)
+                    Client.Logger.LogWarning("Failed to format a component id, are you using message components somewhere else?\n" +
+                                             "To disable this warning switch DisableParseFailureWarnings to true in configuration");
+                return;
+            }
+
+            if (!PendingMenus.TryGetValue(menuId, out var menu)) return;
+            if (menu.Buttons.FirstOrDefault(b => b.Id == buttonId) is not { } button) return;
+            await button.Callable(args.Interaction);
         }
     }
 }

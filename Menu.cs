@@ -59,8 +59,7 @@ namespace DSharpPlus.Menus
             return Task.CompletedTask;
         }
 
-        public DiscordMessageBuilder Serialize() => new DiscordMessageBuilder().AddComponents(
-            Buttons.Select(b => new DiscordButtonComponent(b.Style, $"{id:B}{b.Id:B}", b.Content, b.Disabled, b.Emoji)));
+        public IEnumerable<DiscordComponent> Serialize() => Buttons.Select(b => new DiscordButtonComponent(b.Style, $"{prefix} {id} {b.Id}", b.Content, b.Disabled, b.Emoji));
 
         public virtual Task StopAsync()
         {
