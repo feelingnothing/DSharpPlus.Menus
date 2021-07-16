@@ -1,5 +1,4 @@
 ﻿using System;
-using DSharpPlus.Entities;
 
 namespace DSharpPlus.Menus.Attributes
 {
@@ -42,7 +41,7 @@ namespace DSharpPlus.Menus.Attributes
 
     public class SuccessButtonAttribute : ButtonAttribute
     {
-        public SuccessButtonAttribute(string label, bool disabled = false, DiscordComponentEmoji? emoji = null) : base(ButtonStyle.Success, label, disabled)
+        public SuccessButtonAttribute(string label, bool disabled = false) : base(ButtonStyle.Success, label, disabled)
         {
         }
     }
