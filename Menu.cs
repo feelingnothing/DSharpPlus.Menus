@@ -31,14 +31,16 @@ namespace DSharpPlus.Menus
 
     public abstract class Menu
     {
+        public DiscordClient Client { get; }
+        
         private readonly Guid id = Guid.NewGuid();
         private readonly string prefix;
         internal readonly List<Button> Buttons = new();
 
         protected Menu(DiscordClient client)
         {
-            var ext = client.GetMenus();
-            prefix = ext.Configuration.ComponentPrefix;
+            Client = client;
+            prefix = client.GetMenus().Configuration.ComponentPrefix;
             foreach (var method in GetType().GetMethods())
             {
                 if (!method.IsPublic || method.IsStatic || method.IsAbstract) continue;
