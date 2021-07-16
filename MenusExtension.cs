@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus.EventArgs;
+using Microsoft.Extensions.Logging;
 
 namespace DSharpPlus.Menus
 {
