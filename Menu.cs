@@ -49,7 +49,8 @@ namespace DSharpPlus.Menus
                 if (parameter.ParameterType != typeof(DiscordInteraction) || method.ReturnType != typeof(Task)) continue;
                 var attr = method.GetCustomAttribute<ButtonAttribute>(true);
                 if (attr is null) continue;
-                Buttons.Add(new Button(attr.Id, attr.Style, method.CreateDelegate<Func<DiscordInteraction, Task>>(this), attr.Label, attr.Disabled));
+                Buttons.Add(new Button(attr.Id, attr.Style, method.CreateDelegate<Func<DiscordInteraction, Task>>(this),
+                    attr.Label, attr.Disabled, attr.Emoji));
             }
         }
 
