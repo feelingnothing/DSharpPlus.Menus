@@ -10,12 +10,13 @@ namespace DSharpPlus.Menus
 {
     internal class Button
     {
-        public Button(Guid id, ButtonStyle style, Func<DiscordInteraction, Task> callable, string content, bool disabled = false, DiscordComponentEmoji? emoji = null)
+        public Button(Guid id, ButtonStyle style, Func<DiscordInteraction, Task> callable, string content, int row = 0, bool disabled = false, DiscordComponentEmoji? emoji = null)
         {
             Id = id;
             Style = style;
             Callable = callable;
             Content = content;
+            Row = row;
             Disabled = disabled;
             Emoji = emoji;
         }
@@ -24,6 +25,7 @@ namespace DSharpPlus.Menus
         public ButtonStyle Style { get; }
         public Func<DiscordInteraction, Task> Callable { get; }
         public string Content { get; }
+        public int Row { get; }
         public bool Disabled { get; }
         public DiscordComponentEmoji? Emoji { get; }
     }
@@ -48,7 +50,7 @@ namespace DSharpPlus.Menus
                 var attr = method.GetCustomAttribute<ButtonAttribute>(true);
                 if (attr is null) continue;
                 Buttons.Add(new Button(attr.Id, attr.Style, method.CreateDelegate<Func<DiscordInteraction, Task>>(this),
-                    attr.Label, attr.Disabled, attr.Emoji));
+                    attr.Label, attr.Row, attr.Disabled, attr.Emoji));
             }
         }
 
@@ -58,7 +60,8 @@ namespace DSharpPlus.Menus
             return Task.CompletedTask;
         }
 
-        public IEnumerable<DiscordComponent> Serialize() => Buttons.Select(b => new DiscordButtonComponent(b.Style, $"{prefix} {id} {b.Id}", b.Content, b.Disabled, b.Emoji));
+        public IEnumerable<DiscordActionRowComponent> Serialize() => Buttons.GroupBy(b => b.Row).Select(g => new DiscordActionRowComponent(
+            g.Select(b => new DiscordButtonComponent(b.Style, $"{prefix} {id} {b.Id}", b.Content, b.Disabled, b.Emoji))));
 
         public virtual Task StopAsync()
         {
