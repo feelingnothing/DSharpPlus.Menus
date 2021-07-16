@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
 using DSharpPlus.Menus.Attributes;
+using Newtonsoft.Json;
 
 namespace DSharpPlus.Menus
 {
@@ -31,16 +32,11 @@ namespace DSharpPlus.Menus
 
     public abstract class Menu
     {
-        public DiscordClient Client { get; }
-        
         private readonly Guid id = Guid.NewGuid();
-        private readonly string prefix;
         internal readonly List<Button> Buttons = new();
 
-        protected Menu(DiscordClient client)
+        protected Menu()
         {
-            Client = client;
-            prefix = client.GetMenus().Configuration.ComponentPrefix;
             foreach (var method in GetType().GetMethods())
             {
                 if (!method.IsPublic || method.IsStatic || method.IsAbstract) continue;
@@ -61,8 +57,9 @@ namespace DSharpPlus.Menus
             return Task.CompletedTask;
         }
 
-        public IEnumerable<DiscordActionRowComponent> Serialize() => Buttons.GroupBy(b => b.Row).Select(g => new DiscordActionRowComponent(
-            g.Select(b => new DiscordButtonComponent(b.Style, $"{prefix} {id} {b.Id}", b.Content, b.Disabled, b.Emoji))));
+        public IEnumerable<DiscordActionRowComponent> Serialize() => Buttons.GroupBy(b => b.Row)
+            .Select(g => new DiscordActionRowComponent(g.Select(b => new DiscordButtonComponent(b.Style, JsonConvert.SerializeObject(
+                new MenuButton {MenuId = id, ButtonId = b.Id}), b.Content, b.Disabled, b.Emoji))));
 
         public virtual Task StopAsync()
         {
