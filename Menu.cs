@@ -33,12 +33,13 @@ namespace DSharpPlus.Menus
     public abstract class Menu
     {
         private readonly Guid id = Guid.NewGuid();
+        private readonly string prefix;
         internal readonly List<Button> Buttons = new();
-        public DiscordClient Client { get; }
 
-        public Menu(DiscordClient client)
+        protected Menu(DiscordClient client)
         {
-            Client = client;
+            var ext = client.GetMenus();
+            prefix = ext.Configuration.ComponentPrefix;
             foreach (var method in GetType().GetMethods())
             {
                 if (!method.IsPublic || method.IsStatic || method.IsAbstract) continue;
@@ -63,8 +64,7 @@ namespace DSharpPlus.Menus
 
         public virtual Task StopAsync()
         {
-            if (!MenusExtension.PendingMenus.ContainsKey(id)) return Task.CompletedTask;
-            MenusExtension.PendingMenus.TryRemove(id, out _);
+            if (!MenusExtension.PendingMenus.TryRemove(id, out _)) throw new InvalidOperationException("This menu is already stopped or has not started yet");
             return Task.CompletedTask;
         }
     }
