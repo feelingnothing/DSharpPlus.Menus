@@ -5,7 +5,7 @@
         <Nullable>enable</Nullable>
         <Title>DSharpPlus Menus Extension</Title>
         <PackageId>MenusExtension</PackageId>
-        <Version>0.0.0.5-dev</Version>
+        <Version>0.0.0.6-dev</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
