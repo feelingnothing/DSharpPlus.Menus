@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Menus.Entities;
@@ -11,32 +12,36 @@ namespace DSharpPlus.Menus
     public class MenusExtension : BaseExtension
     {
         internal readonly ConcurrentDictionary<string, StaticMenu> PendingStaticMenus = new();
-        internal readonly ConcurrentDictionary<string, Menu> PendingMenus = new();
+        private ComponentEventWaiter componentEventWaiter = null!;
+
+        public MenusConfiguration Configuration { get; }
+        public MenusExtension(MenusConfiguration configuration) => Configuration = configuration;
 
         protected override void Setup(DiscordClient client)
         {
             if (Client is not null) throw new InvalidOperationException();
             Client = client;
-            Client.ComponentInteractionCreated += HandleMenuInteraction;
+            componentEventWaiter = new ComponentEventWaiter(Client, Configuration);
             Client.ComponentInteractionCreated += HandleStaticMenuInteraction;
         }
 
-        private Task HandleStaticMenuInteraction(DiscordClient sender, InteractionCreateEventArgs args)
+        internal async Task<(ComponentInteractionCreateEventArgs, MenuButton)?> WaitForMenuButton(MenuBase menu, TimeSpan? timeout = null)
+        {
+            timeout ??= Configuration.DefaultMenuTimeout;
+            var token = new CancellationTokenSource(timeout.Value).Token;
+            var result = await componentEventWaiter
+                .WaitForMatchAsync(new ComponentMatchRequest(menu.Id, (_, r) => menu.Buttons.Any(b => b.Id == r.ButtonId), token))
+                .ConfigureAwait(false);
+            return result;
+        }
+
+        private Task HandleStaticMenuInteraction(DiscordClient sender, ComponentInteractionCreateEventArgs args)
         {
             var response = JsonConvert.DeserializeObject<MenuButton>(args.Interaction.Data.CustomId);
             if (response is null) return Task.CompletedTask;
             if (!PendingStaticMenus.TryGetValue(response.MenuId, out var menu)) return Task.CompletedTask;
             if (menu.Buttons.Find(b => b.Id == response.ButtonId) is not { } button) return Task.CompletedTask;
-            return Task.Run(async () => await (await menu.CanBeExecuted(args.Interaction) ? button.Callable.Invoke(args.Interaction) : Task.CompletedTask));
-        }
-
-        private Task HandleMenuInteraction(DiscordClient sender, InteractionCreateEventArgs args)
-        {
-            var response = JsonConvert.DeserializeObject<MenuButton>(args.Interaction.Data.CustomId);
-            if (response is null) return Task.CompletedTask;
-            if (!PendingMenus.TryGetValue(response.MenuId, out var menu)) return Task.CompletedTask;
-            if (menu.Buttons.Find(b => b.Id == response.ButtonId) is not { } button) return Task.CompletedTask;
-            return Task.Run(async () => await (await menu.CanBeExecuted(args.Interaction) ? button.Callable.Invoke(args.Interaction) : Task.CompletedTask));
+            return Task.Run(async () => await (await menu.CanBeExecuted(args) ? button.Callable.Invoke(args) : Task.CompletedTask));
         }
 
         /// <typeparam name="T">The generic type of static menu you want to get</typeparam>

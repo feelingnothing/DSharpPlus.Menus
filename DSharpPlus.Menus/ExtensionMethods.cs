@@ -2,9 +2,9 @@
 {
     public static class ExtensionMethods
     {
-        public static MenusExtension UseMenus(this DiscordClient client)
+        public static MenusExtension UseMenus(this DiscordClient client, MenusConfiguration? configuration = null)
         {
-            var ext = new MenusExtension();
+            var ext = new MenusExtension(configuration ?? new MenusConfiguration());
             client.AddExtension(ext);
             return ext;
         }

@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
 using DSharpPlus.Menus.Attributes;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace DSharpPlus.Menus.Entities
@@ -18,14 +22,57 @@ namespace DSharpPlus.Menus.Entities
     public abstract class MenuBase
     {
         public DiscordClient Client { get; }
+        internal readonly MenusExtension Extension;
         public string Id { get; }
         public MenuStatus Status { get; protected internal set; } = MenuStatus.None;
         protected internal List<IMenuButton> Buttons { get; } = new();
+        protected internal CancellationTokenSource TokenSource { get; } = new();
 
         protected internal MenuBase(DiscordClient client, string id)
         {
             Id = id;
             Client = client;
+            Extension = client.GetMenus();
+        }
+
+        protected internal async Task LoopAsync()
+        {
+            async Task ExecuteButton(IMenuButton button, ComponentInteractionCreateEventArgs args)
+            {
+                try
+                {
+                    if (await CanBeExecuted(args))
+                        await button.Callable.Invoke(args);
+                }
+                catch (Exception e)
+                {
+                    Client.Logger.LogError(e, "Error while executing button");
+                }
+            }
+
+            Status = MenuStatus.Started;
+            while (!TokenSource.IsCancellationRequested)
+            {
+                var result = await Extension.WaitForMenuButton(this, Extension.Configuration.DefaultMenuTimeout);
+                if (result is null)
+                {
+                    // Timed out
+                    await StopAsync();
+                    return;
+                }
+
+                var (args, ids) = result.Value;
+                if (Buttons.FirstOrDefault(b => b.Id == ids.ButtonId) is not { } button) return;
+                switch (Extension.Configuration.ButtonButtonCallback)
+                {
+                    case MenuButtonCallbackBehaviour.Asynchronous:
+                        _ = Task.Run(async () => await ExecuteButton(button, args));
+                        break;
+                    case MenuButtonCallbackBehaviour.Synchronous:
+                        await ExecuteButton(button, args);
+                        break;
+                }
+            }
         }
 
         protected internal IEnumerable<(MethodInfo, T)> CollectInteractionMethodsWithAttribute<T>() where T : BaseButtonAttribute
@@ -36,7 +83,7 @@ namespace DSharpPlus.Menus.Entities
                 var parameters = m.GetParameters();
                 if (parameters.Length is > 1 or 0) return null;
                 var parameter = parameters.First();
-                if (parameter.ParameterType != typeof(DiscordInteraction) || m.ReturnType != typeof(Task)) return null;
+                if (parameter.ParameterType != typeof(ComponentInteractionCreateEventArgs) || m.ReturnType != typeof(Task)) return null;
                 var attr = m.GetCustomAttribute<T>(false);
                 if (attr is null) return null;
                 return (m, attr);
@@ -47,7 +94,7 @@ namespace DSharpPlus.Menus.Entities
             .Select(g => new DiscordActionRowComponent(g.Select(b => new DiscordButtonComponent(b.Style,
                 JsonConvert.SerializeObject(new Menus.MenuButton {MenuId = Id, ButtonId = b.Id}), b.Label, b.Disabled, b.Emoji))));
 
-        public virtual Task<bool> CanBeExecuted(DiscordInteraction interaction) => Task.FromResult(true);
+        public virtual Task<bool> CanBeExecuted(ComponentInteractionCreateEventArgs _) => Task.FromResult(true);
         public abstract Task StartAsync();
         public abstract Task StopAsync();
     }

@@ -42,6 +42,12 @@ namespace DSharpPlus.Menus
             return builder;
         }
 
+        public static DiscordInteractionResponseBuilder AddMenu(this DiscordInteractionResponseBuilder builder, MenuBase menu)
+        {
+            builder.AddComponents(menu.Serialize());
+            return builder;
+        }
+
         public static T GetStaticMenu<T>(this DiscordClient client) where T : StaticMenu => client.GetMenus().GetStaticMenu<T>();
         public static bool TryGetStaticMenu<T>(this DiscordClient client, out StaticMenu? menu) where T : StaticMenu => client.GetMenus().TryGetStaticMenu(out menu);
     }

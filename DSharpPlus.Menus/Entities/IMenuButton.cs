@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
 
 namespace DSharpPlus.Menus.Entities
 {
@@ -8,7 +9,7 @@ namespace DSharpPlus.Menus.Entities
     {
         public string Id { get; }
         public ButtonStyle Style { get; }
-        public Func<DiscordInteraction, Task> Callable { get; }
+        public Func<ComponentInteractionCreateEventArgs, Task> Callable { get; }
         public string Label { get; }
         public ButtonRow Row { get; }
         public bool Disabled { get; }

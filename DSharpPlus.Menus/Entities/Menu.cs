@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
 using DSharpPlus.Menus.Attributes;
 
 namespace DSharpPlus.Menus.Entities
 {
     internal class MenuButton : IMenuButton
     {
-        public MenuButton(ButtonStyle style, Func<DiscordInteraction, Task> callable, string label, ButtonRow row = 0, bool disabled = false, DiscordComponentEmoji? emoji = null)
+        public MenuButton(ButtonStyle style, Func<ComponentInteractionCreateEventArgs, Task> callable, string label,
+            ButtonRow row = 0, bool disabled = false, DiscordComponentEmoji? emoji = null)
         {
             Style = style;
             Callable = callable;
@@ -22,7 +23,7 @@ namespace DSharpPlus.Menus.Entities
 
         public string Id { get; } = Guid.NewGuid().ToString();
         public ButtonStyle Style { get; }
-        public Func<DiscordInteraction, Task> Callable { get; }
+        public Func<ComponentInteractionCreateEventArgs, Task> Callable { get; }
         public string Label { get; }
         public ButtonRow Row { get; }
         public bool Disabled { get; }
@@ -31,13 +32,10 @@ namespace DSharpPlus.Menus.Entities
 
     public abstract class Menu : MenuBase
     {
-        private readonly MenusExtension extension;
-
         public Menu(DiscordClient client) : base(client, Guid.NewGuid().ToString())
         {
-            extension = Client.GetMenus();
             CollectInteractionMethodsWithAttribute<ButtonAttribute>().ToList().ForEach(((MethodInfo i, ButtonAttribute a) t) =>
-                Buttons.Add(new MenuButton(t.a.Style, t.i.CreateDelegate<Func<DiscordInteraction, Task>>(this), t.a.Label, t.a.Row, t.a.Disabled, t.a.Emoji)));
+                Buttons.Add(new MenuButton(t.a.Style, t.i.CreateDelegate<Func<ComponentInteractionCreateEventArgs, Task>>(this), t.a.Label, t.a.Row, t.a.Disabled, t.a.Emoji)));
         }
 
         /// <summary>
@@ -47,15 +45,14 @@ namespace DSharpPlus.Menus.Entities
         public override Task StartAsync()
         {
             if (Status is MenuStatus.Started) throw new InvalidOperationException("This menu is already started");
-            extension.PendingMenus[Id] = this;
-            Status = MenuStatus.Started;
+            _ = Task.Run(async () => await LoopAsync());
             return Task.CompletedTask;
         }
 
         public override Task StopAsync()
         {
             if (Status is MenuStatus.Ended or MenuStatus.None) throw new InvalidOperationException("This menu is already stopped or has not started yet");
-            extension.PendingMenus.Remove(Id, out _);
+            TokenSource.Cancel();
             Status = MenuStatus.Ended;
             return Task.CompletedTask;
         }
