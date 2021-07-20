@@ -35,6 +35,8 @@ namespace DSharpPlus.Menus
             return result;
         }
 
+        // Just to clarify, we are using old implementation of the buttons callbacks because new one was created only for accounting to timeouts
+        // Static menus do not have timeouts so we can rely on this solution
         private Task HandleStaticMenuInteraction(DiscordClient sender, ComponentInteractionCreateEventArgs args)
         {
             var response = JsonConvert.DeserializeObject<MenuButton>(args.Interaction.Data.CustomId);
