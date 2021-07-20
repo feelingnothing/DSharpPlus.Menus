@@ -82,7 +82,7 @@ class MyStaticMenu : StaticMenu
         // Start then send!
         await menu.StartAsync();
         await args.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder()
-                    .AddMenu(this).AsEphemral(true).WithContent("A menu only for you!"));
+                    .AddMenu(this).AsEphemeral(true).WithContent("A menu only for you!"));
     }
     
 }
