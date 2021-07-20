@@ -11,7 +11,7 @@ namespace DSharpPlus.Menus
 {
     public class MenusExtension : BaseExtension
     {
-        internal readonly ConcurrentDictionary<string, StaticMenu> PendingStaticMenus = new();
+        private readonly ConcurrentDictionary<string, StaticMenu> pendingStaticMenus = new();
         private ComponentEventWaiter componentEventWaiter = null!;
 
         public MenusConfiguration Configuration { get; }
@@ -39,8 +39,8 @@ namespace DSharpPlus.Menus
         {
             var response = JsonConvert.DeserializeObject<MenuButton>(args.Interaction.Data.CustomId);
             if (response is null) return Task.CompletedTask;
-            if (!PendingStaticMenus.TryGetValue(response.MenuId, out var menu)) return Task.CompletedTask;
-            if (menu.Buttons.Find(b => b.Id == response.ButtonId) is not { } button) return Task.CompletedTask;
+            if (!pendingStaticMenus.TryGetValue(response.MenuId, out var menu)) return Task.CompletedTask;
+            if (menu.Buttons.FirstOrDefault(b => b.Id == response.ButtonId) is not { } button) return Task.CompletedTask;
             return Task.Run(async () => await (await menu.CanBeExecuted(args) ? button.Callable.Invoke(args) : Task.CompletedTask));
         }
 
@@ -49,7 +49,7 @@ namespace DSharpPlus.Menus
         /// <exception cref="ArgumentException">If menu is not found</exception>
         public T GetStaticMenu<T>() where T : StaticMenu
         {
-            if (PendingStaticMenus.FirstOrDefault(m => m.Value.GetType() == typeof(T)) is not ({ }, { } menu))
+            if (pendingStaticMenus.FirstOrDefault(m => m.Value.GetType() == typeof(T)) is not ({ }, { } menu))
                 throw new ArgumentException("This menu is not registered");
             return (T) menu;
         }
@@ -80,9 +80,9 @@ namespace DSharpPlus.Menus
         public void RegisterStaticMenu<T>(Func<T> predicate) where T : StaticMenu
         {
             var menu = predicate();
-            if (PendingStaticMenus.Any(m => m.Value.GetType() == menu.GetType()))
+            if (pendingStaticMenus.Any(m => m.Value.GetType() == menu.GetType()))
                 throw new ArgumentException("This menu is already registered");
-            PendingStaticMenus[menu.Id] = menu;
+            pendingStaticMenus[menu.Id] = menu;
         }
     }
 }

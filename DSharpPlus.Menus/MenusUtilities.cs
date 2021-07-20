@@ -49,6 +49,6 @@ namespace DSharpPlus.Menus
         }
 
         public static T GetStaticMenu<T>(this DiscordClient client) where T : StaticMenu => client.GetMenus().GetStaticMenu<T>();
-        public static bool TryGetStaticMenu<T>(this DiscordClient client, out StaticMenu? menu) where T : StaticMenu => client.GetMenus().TryGetStaticMenu(out menu);
+        public static bool TryGetStaticMenu<T>(this DiscordClient client, out T? menu) where T : StaticMenu => client.GetMenus().TryGetStaticMenu(out menu);
     }
 }
