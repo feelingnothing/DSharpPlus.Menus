@@ -8,10 +8,7 @@
     <ItemGroup>
       <PackageReference Include="DSharpPlus" Version="4.1.0-nightly-00924" />
       <PackageReference Include="DSharpPlus.CommandsNext" Version="4.1.0-nightly-00924" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\DSharpPlus.Menus\DSharpPlus.Menus\DSharpPlus.Menus.csproj" />
+      <PackageReference Include="DSharpPlus.Menus" Version="1.0.2.5" />
     </ItemGroup>
 
 </Project>
