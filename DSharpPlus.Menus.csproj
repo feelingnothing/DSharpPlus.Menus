@@ -5,14 +5,14 @@
         <Nullable>enable</Nullable>
         <Title>DSharpPlus Menus Extension</Title>
         <PackageId>DSharpPlus.Menus</PackageId>
-        <Version>1.0.0.2</Version>
+        <Version>1.0.2.0</Version>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="DSharpPlus" Version="4.1.0-nightly-00919" />
-      <PackageReference Include="DSharpPlus.CommandsNext" Version="4.1.0-nightly-00919" />
+      <PackageReference Include="DSharpPlus" Version="4.1.0-nightly-00921" />
+      <PackageReference Include="DSharpPlus.CommandsNext" Version="4.1.0-nightly-00921" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     </ItemGroup>
 </Project>
