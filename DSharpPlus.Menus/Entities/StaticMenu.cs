@@ -25,10 +25,10 @@ namespace DSharpPlus.Menus.Entities
         public string Id { get; }
         public ButtonStyle Style { get; }
         public Func<ComponentInteractionCreateEventArgs, Task> Callable { get; }
-        public string Label { get; }
+        public string Label { get; set; }
         public ButtonRow Row { get; }
-        public bool Disabled { get; }
-        public DiscordComponentEmoji? Emoji { get; }
+        public bool Disabled { get; set; }
+        public DiscordComponentEmoji? Emoji { get; set; }
     }
 
     public abstract class StaticMenu : MenuBase
@@ -36,8 +36,8 @@ namespace DSharpPlus.Menus.Entities
         public StaticMenu(string id, DiscordClient client) : base(client, id)
         {
             if (id.Length > 42) throw new ArgumentException("Id of the menu must 42 characters or less due to serialization behaviour");
-            CollectInteractionMethodsWithAttribute<StaticButtonAttribute>().ToList().ForEach(((MethodInfo i, StaticButtonAttribute a) t) =>
-                Buttons.Add(new StaticMenuButton(t.a.Id, t.a.Style, t.i.CreateDelegate<Func<ComponentInteractionCreateEventArgs, Task>>(this), t.a.Label, t.a.Row, t.a.Disabled, t.a.Emoji)));
+            Buttons = CollectInteractionMethodsWithAttribute<StaticButtonAttribute>().ToList().Select(((MethodInfo i, StaticButtonAttribute a) t) => new StaticMenuButton(
+                t.a.Id, t.a.Style, t.i.CreateDelegate<Func<ComponentInteractionCreateEventArgs, Task>>(this), t.a.Label, t.a.Row, t.a.Disabled, t.a.Emoji)).ToList();
         }
 
         public override Task StartAsync() => Task.FromException(new InvalidOperationException("Static menus cannot be started or stopped"));

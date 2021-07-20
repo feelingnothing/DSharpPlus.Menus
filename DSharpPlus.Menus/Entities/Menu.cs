@@ -24,19 +24,17 @@ namespace DSharpPlus.Menus.Entities
         public string Id { get; } = Guid.NewGuid().ToString();
         public ButtonStyle Style { get; }
         public Func<ComponentInteractionCreateEventArgs, Task> Callable { get; }
-        public string Label { get; }
+        public string Label { get; set; }
         public ButtonRow Row { get; }
-        public bool Disabled { get; }
-        public DiscordComponentEmoji? Emoji { get; }
+        public bool Disabled { get; set; }
+        public DiscordComponentEmoji? Emoji { get; set; }
     }
 
     public abstract class Menu : MenuBase
     {
-        public Menu(DiscordClient client) : base(client, Guid.NewGuid().ToString())
-        {
-            CollectInteractionMethodsWithAttribute<ButtonAttribute>().ToList().ForEach(((MethodInfo i, ButtonAttribute a) t) =>
-                Buttons.Add(new MenuButton(t.a.Style, t.i.CreateDelegate<Func<ComponentInteractionCreateEventArgs, Task>>(this), t.a.Label, t.a.Row, t.a.Disabled, t.a.Emoji)));
-        }
+        public Menu(DiscordClient client) : base(client, Guid.NewGuid().ToString()) =>
+            Buttons = CollectInteractionMethodsWithAttribute<ButtonAttribute>().ToList().Select(((MethodInfo i, ButtonAttribute a) t) =>
+                new MenuButton(t.a.Style, t.i.CreateDelegate<Func<ComponentInteractionCreateEventArgs, Task>>(this), t.a.Label, t.a.Row, t.a.Disabled, t.a.Emoji)).ToList();
 
         /// <summary>
         /// Starts your menu for you, use it only once

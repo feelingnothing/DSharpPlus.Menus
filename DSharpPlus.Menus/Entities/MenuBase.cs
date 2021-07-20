@@ -25,7 +25,7 @@ namespace DSharpPlus.Menus.Entities
         internal readonly MenusExtension Extension;
         public string Id { get; }
         public MenuStatus Status { get; protected internal set; } = MenuStatus.None;
-        protected internal List<IMenuButton> Buttons { get; } = new();
+        public IReadOnlyList<IMenuButton> Buttons { get; protected internal set; } = new List<IMenuButton>();
         protected internal CancellationTokenSource TokenSource { get; } = new();
 
         protected internal MenuBase(DiscordClient client, string id)
