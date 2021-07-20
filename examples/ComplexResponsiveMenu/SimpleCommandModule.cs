@@ -12,6 +12,7 @@ namespace ComplexResponsiveMenu
 {
     public class MyStaticMenu : StaticMenu
     {
+        // Any static id must be is 42 letters or less
         public MyStaticMenu(DiscordClient client) : base("best_static_menu_id", client)
         {
         }
