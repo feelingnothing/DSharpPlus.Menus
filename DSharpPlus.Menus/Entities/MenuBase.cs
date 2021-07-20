@@ -83,7 +83,7 @@ namespace DSharpPlus.Menus.Entities
             {
                 if (!m.IsPublic || m.IsStatic || m.IsAbstract) return null;
                 var parameters = m.GetParameters();
-                if (parameters.Length is > 1 or 0) return null;
+                if (parameters.Length is not 1) return null;
                 var parameter = parameters.First();
                 if (parameter.ParameterType != typeof(ComponentInteractionCreateEventArgs) || m.ReturnType != typeof(Task)) return null;
                 var attr = m.GetCustomAttribute<T>(false);
