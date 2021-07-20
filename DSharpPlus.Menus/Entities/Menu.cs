@@ -32,7 +32,7 @@ namespace DSharpPlus.Menus.Entities
 
     public abstract class Menu : MenuBase
     {
-        public Menu(DiscordClient client) : base(client, Guid.NewGuid().ToString()) =>
+        public Menu(DiscordClient client, TimeSpan? timeout = null) : base(client, Guid.NewGuid().ToString(), timeout) =>
             Buttons = CollectInteractionMethodsWithAttribute<ButtonAttribute>().ToList().Select(((MethodInfo i, ButtonAttribute a) t) =>
                 new MenuButton(t.a.Style, t.i.CreateDelegate<Func<ComponentInteractionCreateEventArgs, Task>>(this), t.a.Label, t.a.Row, t.a.Disabled, t.a.Emoji)).ToList();
 
