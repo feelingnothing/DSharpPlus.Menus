@@ -41,6 +41,6 @@ namespace DSharpPlus.Menus.Entities
         }
 
         public override Task StartAsync() => Task.FromException(new InvalidOperationException("Static menus cannot be started or stopped"));
-        public override Task StopAsync() => Task.FromException(new InvalidOperationException("Static menus cannot be started or stopped"));
+        public override Task StopAsync(bool _ = false) => Task.FromException(new InvalidOperationException("Static menus cannot be started or stopped"));
     }
 }

@@ -49,7 +49,7 @@ namespace DSharpPlus.Menus.Entities
             return Task.CompletedTask;
         }
 
-        public override Task StopAsync()
+        public override Task StopAsync(bool timeout = false)
         {
             if (Status is MenuStatus.Ended or MenuStatus.None) throw new InvalidOperationException("This menu is already stopped or has not started yet");
             TokenSource.Cancel();

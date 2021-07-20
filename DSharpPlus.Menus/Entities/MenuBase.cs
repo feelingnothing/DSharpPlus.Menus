@@ -57,7 +57,7 @@ namespace DSharpPlus.Menus.Entities
                 if (result is null)
                 {
                     // Timed out
-                    await StopAsync();
+                    await StopAsync(true);
                     return;
                 }
 
@@ -96,6 +96,6 @@ namespace DSharpPlus.Menus.Entities
 
         public virtual Task<bool> CanBeExecuted(ComponentInteractionCreateEventArgs _) => Task.FromResult(true);
         public abstract Task StartAsync();
-        public abstract Task StopAsync();
+        public abstract Task StopAsync(bool timeout = false);
     }
 }
