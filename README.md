@@ -63,18 +63,18 @@ They are very similar with regular ones but you can send multiple copies of one 
 they will work even after bot restart  
 To start using it you need first of all create a static menu class with `Menus.Intities.StaticMenu`
 
-#### Important note: Maximum length of the custom id in the static menus are 42 characters or less!!
+#### Important note: Maximum length of the custom id in the static menus are 40 characters or less!!
 
 ```c#
 class MyStaticMenu : StaticMenu
 {
-    // Important note that maximum length of the menu id and button id is 42 or less!
-    public MyStaticMenu(DiscordClient client) : base("maximumLengthOfTheCustomIdIs42Characters", clisnt)
+    // Important note that maximum length of the menu id and button id is 40 or less!
+    public MyStaticMenu(DiscordClient client) : base("maximumLengthOfTheCustomIdIs40Characters", clisnt)
     {
     }
     
     // Static menus have their own buttons attributes, do not use regular ones, menu would not recognize them
-    [StaticSecondaryButton("notForgetAboutTheLimitationOf42Characters", "Click to create a menu only for you")]
+    [StaticSecondaryButton("LimitIs40Charachers", "Click to create a menu only for you")]
     public async Task CreateEphemeralMenuAsync(ComponentInteractionCreateEventArgs args)
     {
         await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
