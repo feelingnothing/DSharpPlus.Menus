@@ -27,7 +27,7 @@ namespace DSharpPlus.Menus.Entities
         public TimeSpan TimeOutSpan { get; }
         public MenuStatus Status { get; protected internal set; } = MenuStatus.None;
         public IReadOnlyList<IMenuButton> Buttons { get; protected internal set; } = new List<IMenuButton>();
-        protected CancellationTokenSource TokenSource { get; }
+        protected internal CancellationTokenSource TokenSource { get; }
 
         protected internal MenuBase(DiscordClient client, string id, TimeSpan? timeout = null)
         {
