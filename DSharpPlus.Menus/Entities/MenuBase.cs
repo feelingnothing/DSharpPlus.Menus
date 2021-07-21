@@ -27,7 +27,7 @@ namespace DSharpPlus.Menus.Entities
         public TimeSpan TimeOutSpan { get; }
         public MenuStatus Status { get; protected internal set; } = MenuStatus.None;
         public IReadOnlyList<IMenuButton> Buttons { get; protected internal set; } = new List<IMenuButton>();
-        protected internal CancellationTokenSource TokenSource { get; } = new();
+        protected CancellationTokenSource TokenSource { get; }
 
         protected internal MenuBase(DiscordClient client, string id, TimeSpan? timeout = null)
         {
@@ -35,6 +35,7 @@ namespace DSharpPlus.Menus.Entities
             Client = client;
             Extension = client.GetMenus();
             TimeOutSpan = timeout ?? Extension.Configuration.DefaultMenuTimeout;
+            TokenSource = new CancellationTokenSource(TimeOutSpan);
         }
 
         protected internal async Task LoopAsync()
@@ -55,7 +56,7 @@ namespace DSharpPlus.Menus.Entities
             Status = MenuStatus.Started;
             while (!TokenSource.IsCancellationRequested)
             {
-                var result = await Extension.WaitForMenuButton(this, TimeOutSpan);
+                var result = await Extension.WaitForMenuButton(this, TokenSource.Token);
                 if (result is null)
                 {
                     // Timed out

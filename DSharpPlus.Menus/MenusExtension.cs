@@ -27,12 +27,11 @@ namespace DSharpPlus.Menus
             Client.ComponentInteractionCreated += HandleStaticMenuInteraction;
         }
 
-        internal async Task<(ComponentInteractionCreateEventArgs, MenuButton)?> WaitForMenuButton(MenuBase menu, TimeSpan? timeout = null)
+        internal async Task<(ComponentInteractionCreateEventArgs, MenuButton)?> WaitForMenuButton(MenuBase menu, CancellationToken? token = null)
         {
-            timeout ??= Configuration.DefaultMenuTimeout;
-            var token = new CancellationTokenSource(timeout.Value).Token;
+            token ??= new CancellationTokenSource(Configuration.DefaultMenuTimeout).Token;
             var result = await componentEventWaiter
-                .WaitForMatchAsync(new ComponentMatchRequest(menu.Id, (_, r) => menu.Buttons.Any(b => b.Id == r.ButtonId), token))
+                .WaitForMatchAsync(new ComponentMatchRequest(menu.Id, (_, r) => menu.Buttons.Any(b => b.Id == r.ButtonId), token.Value))
                 .ConfigureAwait(false);
             return result;
         }
