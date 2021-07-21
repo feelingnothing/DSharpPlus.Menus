@@ -27,7 +27,7 @@ namespace DSharpPlus.Menus.Entities
         public TimeSpan TimeOutSpan { get; }
         public MenuStatus Status { get; protected internal set; } = MenuStatus.None;
         public IReadOnlyList<IMenuButton> Buttons { get; protected internal set; } = new List<IMenuButton>();
-        protected internal CancellationTokenSource TokenSource { get; }
+        internal protected CancellationTokenSource TokenSource { get; }
 
         protected internal MenuBase(DiscordClient client, string id, TimeSpan? timeout = null)
         {
@@ -97,7 +97,7 @@ namespace DSharpPlus.Menus.Entities
             .Select(g => new DiscordActionRowComponent(g.Select(b => new DiscordButtonComponent(b.Style,
                 MenusExtension.IdPrefix + JsonConvert.SerializeObject(new Menus.MenuButton {MenuId = Id, ButtonId = b.Id}), b.Label, b.Disabled, b.Emoji))));
 
-        public virtual Task<bool> CanBeExecuted(ComponentInteractionCreateEventArgs _) => Task.FromResult(true);
+        public virtual Task<bool> CanBeExecuted(ComponentInteractionCreateEventArgs args) => Task.FromResult(true);
         public abstract Task StartAsync();
         public abstract Task StopAsync(bool timeout = false);
     }
