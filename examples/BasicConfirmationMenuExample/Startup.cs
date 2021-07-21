@@ -18,7 +18,10 @@ namespace BasicConfirmationMenuExample
             var client = services.GetRequiredService<DiscordClient>();
             var commands = services.GetRequiredService<CommandsNextExtension>();
 
-            client.UseMenus();
+            client.UseMenus(new MenusConfiguration
+            {
+                ResponseBehaviour = ComponentResponseBehaviour.Ack,
+            });
             commands.RegisterCommands<SimpleCommandModule>();
 
             await client.ConnectAsync();
