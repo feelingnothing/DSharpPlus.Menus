@@ -65,7 +65,7 @@ namespace DSharpPlus.Menus
 
             if (!request.IsMatch(args, response))
             {
-                if (configuration.ResponseBehaviour != ComponentResponseBehaviour.Respond) return;
+                if (configuration.ResponseBehaviour is not ComponentResponseBehaviour.Respond) return;
                 await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                 await args.Interaction.CreateFollowupMessageAsync(message);
                 return;
