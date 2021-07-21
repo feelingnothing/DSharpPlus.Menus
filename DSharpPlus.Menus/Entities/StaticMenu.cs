@@ -35,7 +35,7 @@ namespace DSharpPlus.Menus.Entities
     {
         public StaticMenu(string id, DiscordClient client) : base(client, id)
         {
-            if (id.Length > 42) throw new ArgumentException("Id of the menu must 42 characters or less due to serialization behaviour");
+            if (id.Length > 40) throw new ArgumentException("Id of the menu must 42 characters or less due to serialization behaviour");
             Buttons = CollectInteractionMethodsWithAttribute<StaticButtonAttribute>().ToList().Select(((MethodInfo i, StaticButtonAttribute a) t) => new StaticMenuButton(
                 t.a.Id, t.a.Style, t.i.CreateDelegate<Func<ComponentInteractionCreateEventArgs, Task>>(this), t.a.Label, t.a.Row, t.a.Disabled, t.a.Emoji)).ToList();
         }
