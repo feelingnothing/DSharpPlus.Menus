@@ -28,6 +28,8 @@ To use simple auto-generated menus use provided `Menus.Entities.Menu` class
 class MyMenu : Menu
 {
     public MyMenu(DiscordClient client) : base(client)
+    {
+    }
 
     // For this button to be registered it must have one of the button attributes,
     // have `ComponentInteractionCreateEventArgs` as first and only parameter and return `Task`
