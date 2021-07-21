@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Menus.Entities;
-using Newtonsoft.Json;
 
 namespace DSharpPlus.Menus
 {
@@ -14,6 +13,9 @@ namespace DSharpPlus.Menus
         private readonly ConcurrentDictionary<string, StaticMenu> pendingStaticMenus = new();
         private ComponentEventWaiter componentEventWaiter = null!;
 
+        // Constant prefix would allow to distinguish menus from this extension and others, this would give the waiter to ack buttons that are not found
+        // Must be as small as possible to allow custom ids to be bigger, means DSharp MenusExtension
+        internal const string IdPrefix = "DSME";
         public MenusConfiguration Configuration { get; }
         public MenusExtension(MenusConfiguration configuration) => Configuration = configuration;
 
@@ -39,7 +41,10 @@ namespace DSharpPlus.Menus
         // Static menus do not have timeouts so we can rely on this solution
         private Task HandleStaticMenuInteraction(DiscordClient sender, ComponentInteractionCreateEventArgs args)
         {
-            var response = JsonConvert.DeserializeObject<MenuButton>(args.Interaction.Data.CustomId);
+            var id = args.Interaction.Data.CustomId;
+            if (id.Length < IdPrefix.Length) return Task.CompletedTask;
+            if (id[..IdPrefix.Length] != IdPrefix) return Task.CompletedTask;
+            var response = id[IdPrefix.Length..].ParseJson<MenuButton>();
             if (response is null) return Task.CompletedTask;
             if (!pendingStaticMenus.TryGetValue(response.MenuId, out var menu)) return Task.CompletedTask;
             if (menu.Buttons.FirstOrDefault(b => b.Id == response.ButtonId) is not { } button) return Task.CompletedTask;

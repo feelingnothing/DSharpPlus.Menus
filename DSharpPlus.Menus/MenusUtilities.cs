@@ -50,5 +50,22 @@ namespace DSharpPlus.Menus
 
         public static T GetStaticMenu<T>(this DiscordClient client) where T : StaticMenu => client.GetMenus().GetStaticMenu<T>();
         public static bool TryGetStaticMenu<T>(this DiscordClient client, out T? menu) where T : StaticMenu => client.GetMenus().TryGetStaticMenu(out menu);
+
+        internal static T? ParseJson<T>(this string @this)
+        {
+            T? result;
+
+            try
+            {
+                result = JsonConvert.DeserializeObject<T>(@this,
+                    new JsonSerializerSettings {Error = (_, args) => args.ErrorContext.Handled = true});
+            }
+            catch (JsonSerializationException)
+            {
+                result = default;
+            }
+
+            return result;
+        }
     }
 }

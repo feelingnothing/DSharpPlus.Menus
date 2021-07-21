@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
-using Newtonsoft.Json;
 
 // Thanks to Velvet for this peace of code, without him i would not know how TaskCompletionSource works and even existed
 // https://github.com/VelvetThePanda
@@ -51,10 +50,18 @@ namespace DSharpPlus.Menus
 
         private async Task Handle(DiscordClient sender, ComponentInteractionCreateEventArgs args)
         {
-            var response = JsonConvert.DeserializeObject<MenuButton>(args.Interaction.Data.CustomId);
-            if (response is null) return;
-            if (!requests.TryGetValue(response.MenuId, out var request))
+            var id = args.Interaction.Data.CustomId;
+            if (id.Length < MenusExtension.IdPrefix.Length) return;
+            if (id[..MenusExtension.IdPrefix.Length] != MenusExtension.IdPrefix) return;
+            var response = id[MenusExtension.IdPrefix.Length..].ParseJson<MenuButton>();
+            if (response is null || !requests.TryGetValue(response.MenuId, out var request))
+            {
+                if (configuration.ResponseBehaviour is ComponentResponseBehaviour.Ack or ComponentResponseBehaviour.Respond)
+                    await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                if (configuration.ResponseBehaviour is ComponentResponseBehaviour.Respond)
+                    await args.Interaction.CreateFollowupMessageAsync(message);
                 return;
+            }
 
             if (!request.IsMatch(args, response))
             {

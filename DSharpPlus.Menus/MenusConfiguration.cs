@@ -5,6 +5,7 @@ namespace DSharpPlus.Menus
     public enum ComponentResponseBehaviour
     {
         Ignore,
+        Ack,
         Respond
     }
 
@@ -37,6 +38,6 @@ namespace DSharpPlus.Menus
         /// Synchronous behaviour means that no other button would be processed if one of the buttons are executing at that time
         /// Asynchronous behaviour means that every button callback will be invoked in the background task;
         /// </summary>
-        public MenuButtonCallbackBehaviour ButtonButtonCallback { internal get; set; } = MenuButtonCallbackBehaviour.Synchronous;
+        public MenuButtonCallbackBehaviour ButtonButtonCallback { internal get; set; } = MenuButtonCallbackBehaviour.Asynchronous;
     }
 }
