@@ -11,7 +11,8 @@ namespace DSharpPlus.Menus.Entities
         public ButtonStyle Style { get; }
         public Func<ComponentInteractionCreateEventArgs, Task> Callable { get; }
         public string Label { get; }
-        public ButtonRow Row { get; }
+        public ButtonPosition Location { get; }
+        public ButtonPosition Row { get; }
         public bool Disabled { get; }
         public DiscordComponentEmoji? Emoji { get; }
     }

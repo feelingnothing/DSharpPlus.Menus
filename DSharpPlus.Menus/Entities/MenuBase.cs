@@ -94,8 +94,8 @@ namespace DSharpPlus.Menus.Entities
         }
 
         internal IEnumerable<DiscordActionRowComponent> Serialize() => Buttons.GroupBy(b => b.Row)
-            .Select(g => new DiscordActionRowComponent(g.Select(b => new DiscordButtonComponent(b.Style,
-                MenusExtension.IdPrefix + JsonConvert.SerializeObject(new Menus.MenuButton {MenuId = Id, ButtonId = b.Id}), b.Label, b.Disabled, b.Emoji))));
+            .Select(g => new DiscordActionRowComponent(g.OrderBy(b => b.Location).Select(b => new DiscordButtonComponent(
+                b.Style, MenusExtension.IdPrefix + JsonConvert.SerializeObject(new Menus.MenuButton {MenuId = Id, ButtonId = b.Id}), b.Label, b.Disabled, b.Emoji))));
 
         public virtual Task<bool> CanBeExecuted(ComponentInteractionCreateEventArgs args) => Task.FromResult(true);
         public abstract Task StartAsync();

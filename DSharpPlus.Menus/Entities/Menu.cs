@@ -10,12 +10,13 @@ namespace DSharpPlus.Menus.Entities
 {
     internal class MenuButton : IMenuButton
     {
-        public MenuButton(ButtonStyle style, Func<ComponentInteractionCreateEventArgs, Task> callable, string label,
-            ButtonRow row = 0, bool disabled = false, DiscordComponentEmoji? emoji = null)
+        public MenuButton(ButtonStyle style, Func<ComponentInteractionCreateEventArgs, Task> callable, string label, ButtonPosition location = ButtonPosition.First,
+            ButtonPosition row = 0, bool disabled = false, DiscordComponentEmoji? emoji = null)
         {
             Style = style;
             Callable = callable;
             Label = label;
+            Location = location;
             Row = row;
             Disabled = disabled;
             Emoji = emoji;
@@ -25,7 +26,8 @@ namespace DSharpPlus.Menus.Entities
         public ButtonStyle Style { get; }
         public Func<ComponentInteractionCreateEventArgs, Task> Callable { get; }
         public string Label { get; set; }
-        public ButtonRow Row { get; }
+        public ButtonPosition Location { get; }
+        public ButtonPosition Row { get; }
         public bool Disabled { get; set; }
         public DiscordComponentEmoji? Emoji { get; set; }
     }
@@ -33,8 +35,8 @@ namespace DSharpPlus.Menus.Entities
     public abstract class Menu : MenuBase
     {
         public Menu(DiscordClient client, TimeSpan? timeout = null) : base(client, Guid.NewGuid().ToString(), timeout) =>
-            Buttons = CollectInteractionMethodsWithAttribute<ButtonAttribute>().ToList().Select(((MethodInfo i, ButtonAttribute a) t) =>
-                new MenuButton(t.a.Style, t.i.CreateDelegate<Func<ComponentInteractionCreateEventArgs, Task>>(this), t.a.Label, t.a.Row, t.a.Disabled, t.a.Emoji)).ToList();
+            Buttons = CollectInteractionMethodsWithAttribute<ButtonAttribute>().ToList().Select(((MethodInfo i, ButtonAttribute a) t) => new MenuButton(t.a.Style,
+                t.i.CreateDelegate<Func<ComponentInteractionCreateEventArgs, Task>>(this), t.a.Label, t.a.Location, t.a.Row, t.a.Disabled, t.a.Emoji)).ToList();
 
         /// <summary>
         /// Starts your menu for you, use it only once

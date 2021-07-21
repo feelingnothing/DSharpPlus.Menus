@@ -13,7 +13,7 @@ namespace DSharpPlus.Menus
         public string ButtonId { get; init; } = null!;
     }
 
-    public enum ButtonRow
+    public enum ButtonPosition
     {
         First = 1,
         Second = 2,
