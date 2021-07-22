@@ -14,9 +14,9 @@ namespace BasicConfirmationMenuExample
     public class ConfirmationMenu : Menu
     {
         private readonly ulong member;
-        public TaskCompletionSource<bool?> Tcs { get; } = new();
+        private TaskCompletionSource<bool?> Tcs { get; } = new();
 
-        public ConfirmationMenu(ulong member, TimeSpan timeout, DiscordClient client) : base(client, timeout) =>
+        private ConfirmationMenu(ulong member, DiscordClient client, TimeSpan? timeout = null) : base(client, timeout) =>
             this.member = member;
 
         public override Task<bool> CanBeExecuted(ComponentInteractionCreateEventArgs args) =>
@@ -27,6 +27,15 @@ namespace BasicConfirmationMenuExample
             await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
             Tcs.TrySetResult(value);
             await StopAsync();
+        }
+
+        public static async Task<bool?> AskAsync(DiscordMessageBuilder builder, CommandContext ctx, TimeSpan? timeout = null, ulong? member = null)
+        {
+            member ??= ctx.Member.Id;
+            var menu = new ConfirmationMenu(member.Value, ctx.Client, timeout);
+            await menu.StartAsync();
+            await ctx.RespondAsync(builder.AddMenu(menu));
+            return await menu.Tcs.Task.ConfigureAwait(false);
         }
 
         [SuccessButton("Confirm")]
@@ -48,10 +57,9 @@ namespace BasicConfirmationMenuExample
         [GroupCommand]
         public async Task SomethingImportantAsync(CommandContext ctx)
         {
-            var menu = new ConfirmationMenu(ctx.Member.Id, TimeSpan.FromSeconds(10), ctx.Client);
-            await menu.StartAsync();
-            await ctx.RespondAsync(new DiscordMessageBuilder().AddMenu(menu).WithContent("Are you confirming this action?"));
-            var result = await menu.Tcs.Task.ConfigureAwait(false);
+            var builder = new DiscordMessageBuilder().AddEmbed(
+                new DiscordEmbedBuilder().WithColor(DiscordColor.Red).WithDescription("Really ***important*** action!\nDo you confirm it?"));
+            var result = await ConfirmationMenu.AskAsync(builder, ctx, TimeSpan.FromMinutes(1));
             if (result is null) await ctx.RespondAsync("Your time have ran up, count as denied");
             else await ctx.RespondAsync(result.Value ? "You have confirmed this action!" : "You have denied this action.");
         }
