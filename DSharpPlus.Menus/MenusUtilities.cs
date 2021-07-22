@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace DSharpPlus.Menus
 {
-    internal class MenuButton
+    internal class MenuButtonDescriptor
     {
         [JsonProperty(PropertyName = "m", Required = Required.Always)]
         public string MenuId { get; init; } = null!;
@@ -57,8 +57,7 @@ namespace DSharpPlus.Menus
 
             try
             {
-                result = JsonConvert.DeserializeObject<T>(@this,
-                    new JsonSerializerSettings {Error = (_, args) => args.ErrorContext.Handled = true});
+                result = JsonConvert.DeserializeObject<T>(@this);
             }
             catch (JsonSerializationException)
             {
@@ -67,5 +66,9 @@ namespace DSharpPlus.Menus
 
             return result;
         }
+
+        internal static string SerializeButton(this MenuBase menu, IClickableMenuButton button) =>
+            MenusExtension.IdPrefix + (menu is StaticMenu ? MenusExtension.StaticMenuPrefix : MenusExtension.RegularMenuPrefix) +
+            JsonConvert.SerializeObject(new MenuButtonDescriptor {MenuId = menu.Id, ButtonId = button.Id});
     }
 }

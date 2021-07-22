@@ -1,42 +1,60 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Menus.Attributes;
+using Microsoft.Extensions.Logging;
 
 namespace DSharpPlus.Menus.Entities
 {
-    internal class MenuButton : IMenuButton
-    {
-        public MenuButton(ButtonStyle style, Func<ComponentInteractionCreateEventArgs, Task> callable, string label, ButtonPosition location = ButtonPosition.First,
-            ButtonPosition row = 0, bool disabled = false, DiscordComponentEmoji? emoji = null)
-        {
-            Style = style;
-            Callable = callable;
-            Label = label;
-            Location = location;
-            Row = row;
-            Disabled = disabled;
-            Emoji = emoji;
-        }
-
-        public string Id { get; } = Guid.NewGuid().ToString();
-        public ButtonStyle Style { get; }
-        public Func<ComponentInteractionCreateEventArgs, Task> Callable { get; }
-        public string Label { get; set; }
-        public ButtonPosition Location { get; }
-        public ButtonPosition Row { get; }
-        public bool Disabled { get; set; }
-        public DiscordComponentEmoji? Emoji { get; set; }
-    }
-
     public abstract class Menu : MenuBase
     {
-        public Menu(DiscordClient client, TimeSpan? timeout = null) : base(client, Guid.NewGuid().ToString(), timeout) =>
-            Buttons = CollectInteractionMethodsWithAttribute<ButtonAttribute>().ToList().Select(((MethodInfo i, ButtonAttribute a) t) => new MenuButton(t.a.Style,
-                t.i.CreateDelegate<Func<ComponentInteractionCreateEventArgs, Task>>(this), t.a.Label, t.a.Location, t.a.Row, t.a.Disabled, t.a.Emoji)).ToList();
+        public Menu(DiscordClient client, TimeSpan? timeout = null) : base(client, Guid.NewGuid().ToString(), timeout)
+        {
+            foreach (var (info, attribute) in CollectInteractionMethodsWithAttribute<ButtonAttribute>())
+                Buttons.Add(new ClickableMenuButton(attribute.Style, info.CreateDelegate<Func<IStyledMenuButton, ComponentInteractionCreateEventArgs, Task>>(this),
+                    attribute.Label, attribute.Location, attribute.Row, attribute.Disabled, attribute.Emoji));
+        }
+
+        protected internal async Task LoopAsync()
+        {
+            async Task ExecuteButton(IClickableMenuButton button, ComponentInteractionCreateEventArgs args)
+            {
+                try
+                {
+                    if (await CanBeExecuted(args))
+                        await button.Callable.Invoke(button, args);
+                }
+                catch (Exception e)
+                {
+                    Client.Logger.LogError(e, "Error while executing button");
+                }
+            }
+
+            Status = MenuStatus.Started;
+            while (!TokenSource.IsCancellationRequested)
+            {
+                var result = await Extension.WaitForMenuButton(this, TokenSource.Token);
+                if (result is null)
+                {
+                    // Timed out
+                    await StopAsync(true);
+                    return;
+                }
+
+                var (args, ids) = result.Value;
+                if (Buttons.OfType<IClickableMenuButton>().FirstOrDefault(b => b.Id == ids.ButtonId) is not { } button) return;
+                switch (Extension.Configuration.ButtonButtonCallback)
+                {
+                    case MenuButtonCallbackBehaviour.Asynchronous:
+                        _ = Task.Run(async () => await ExecuteButton(button, args));
+                        break;
+                    case MenuButtonCallbackBehaviour.Synchronous:
+                        await ExecuteButton(button, args);
+                        break;
+                }
+            }
+        }
 
         /// <summary>
         /// Starts your menu for you, use it only once

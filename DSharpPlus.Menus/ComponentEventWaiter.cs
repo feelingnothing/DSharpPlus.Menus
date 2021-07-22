@@ -13,18 +13,17 @@ namespace DSharpPlus.Menus
     internal class ComponentMatchRequest
     {
         public string Id { get; }
-        public TaskCompletionSource<(ComponentInteractionCreateEventArgs, MenuButton)?> Tcs { get; } = new();
+        public TaskCompletionSource<(ComponentInteractionCreateEventArgs, MenuButtonDescriptor)?> Tcs { get; } = new();
+        private readonly Func<ComponentInteractionCreateEventArgs, MenuButtonDescriptor, bool> predicate;
 
-        private readonly Func<ComponentInteractionCreateEventArgs, MenuButton, bool> predicate;
-
-        public ComponentMatchRequest(string id, Func<ComponentInteractionCreateEventArgs, MenuButton, bool> predicate, CancellationToken token)
+        public ComponentMatchRequest(string id, Func<ComponentInteractionCreateEventArgs, MenuButtonDescriptor, bool> predicate, CancellationToken token)
         {
             Id = id;
             this.predicate = predicate;
             token.Register(() => Tcs.TrySetResult(null));
         }
 
-        public bool IsMatch(ComponentInteractionCreateEventArgs interaction, MenuButton button) => predicate(interaction, button);
+        public bool IsMatch(ComponentInteractionCreateEventArgs interaction, MenuButtonDescriptor button) => predicate(interaction, button);
     }
 
     internal class ComponentEventWaiter
@@ -40,7 +39,7 @@ namespace DSharpPlus.Menus
             message = new DiscordFollowupMessageBuilder().WithContent(configuration.ResponseMessage).AsEphemeral(true);
         }
 
-        public async Task<(ComponentInteractionCreateEventArgs, MenuButton)?> WaitForMatchAsync(ComponentMatchRequest request)
+        public async Task<(ComponentInteractionCreateEventArgs, MenuButtonDescriptor)?> WaitForMatchAsync(ComponentMatchRequest request)
         {
             requests[request.Id] = request;
             var result = await request.Tcs.Task.ConfigureAwait(false);
@@ -51,9 +50,11 @@ namespace DSharpPlus.Menus
         private async Task Handle(DiscordClient sender, ComponentInteractionCreateEventArgs args)
         {
             var id = args.Interaction.Data.CustomId;
-            if (id.Length < MenusExtension.IdPrefix.Length) return;
-            if (id[..MenusExtension.IdPrefix.Length] != MenusExtension.IdPrefix) return;
-            var response = id[MenusExtension.IdPrefix.Length..].ParseJson<MenuButton>();
+            if (id.Length < MenusExtension.IdPrefix.Length
+                || id[..MenusExtension.IdPrefix.Length] != MenusExtension.IdPrefix
+                || id[MenusExtension.IdPrefix.Length] != MenusExtension.RegularMenuPrefix) return;
+
+            var response = id[(MenusExtension.IdPrefix.Length + 1)..].ParseJson<MenuButtonDescriptor>();
             if (response is null || !requests.TryGetValue(response.MenuId, out var request))
             {
                 if (configuration.ResponseBehaviour is ComponentResponseBehaviour.Ack or ComponentResponseBehaviour.Respond)
