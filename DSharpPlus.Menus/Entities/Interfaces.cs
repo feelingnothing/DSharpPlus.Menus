@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
-using DSharpPlus.EventArgs;
 
 namespace DSharpPlus.Menus.Entities
 {
@@ -23,10 +22,10 @@ namespace DSharpPlus.Menus.Entities
         public ButtonStyle Style { get; set; }
     }
 
-    internal interface IClickableMenuButton : IStyledMenuButton
+    public interface IClickableMenuButton : IStyledMenuButton
     {
         public string Id { get; }
-        public Func<IClickableMenuButton, ComponentInteractionCreateEventArgs, Task> Callable { get; }
+        public Func<ButtonContext, Task> Callable { get; }
     }
 
     internal interface ILinkMenuButton : IMenuButton

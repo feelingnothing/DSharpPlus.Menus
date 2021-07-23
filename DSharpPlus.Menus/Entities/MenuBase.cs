@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
-using DSharpPlus.EventArgs;
 using DSharpPlus.Menus.Attributes;
 
 namespace DSharpPlus.Menus.Entities
@@ -45,10 +44,8 @@ namespace DSharpPlus.Menus.Entities
             {
                 if (!m.IsPublic || m.IsStatic || m.IsAbstract) return null;
                 var parameters = m.GetParameters();
-                if (parameters.Length is not 2) return null;
-                if (parameters[0].ParameterType != typeof(IStyledMenuButton)
-                    || parameters[1].ParameterType != typeof(ComponentInteractionCreateEventArgs)
-                    || m.ReturnType != typeof(Task)) return null;
+                if (parameters.Length is not 1) return null;
+                if (parameters.First().ParameterType != typeof(ButtonContext) || m.ReturnType != typeof(Task)) return null;
                 var attr = m.GetCustomAttribute<T>(false);
                 if (attr is null) return null;
                 return (m, attr);
@@ -80,7 +77,7 @@ namespace DSharpPlus.Menus.Entities
             return serialized;
         }
 
-        public virtual Task<bool> CanBeExecuted(ComponentInteractionCreateEventArgs args) => Task.FromResult(true);
+        public virtual Task<bool> CanBeExecuted(ButtonContext args) => Task.FromResult(true);
         public abstract Task StartAsync();
         public abstract Task StopAsync(bool timeout = false);
     }

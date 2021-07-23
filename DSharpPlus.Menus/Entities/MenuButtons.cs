@@ -7,7 +7,7 @@ namespace DSharpPlus.Menus.Entities
 {
     internal class ClickableMenuButton : IClickableMenuButton
     {
-        public ClickableMenuButton(ButtonStyle style, Func<IStyledMenuButton, ComponentInteractionCreateEventArgs, Task> callable, string label,
+        public ClickableMenuButton(ButtonStyle style, Func<ButtonContext, Task> callable, string label,
             ButtonPosition location = ButtonPosition.First, ButtonPosition row = 0, bool disabled = false, DiscordComponentEmoji? emoji = null)
         {
             Style = style;
@@ -21,7 +21,7 @@ namespace DSharpPlus.Menus.Entities
 
         public string Id { get; } = Guid.NewGuid().ToString();
         public ButtonStyle Style { get; set; }
-        public Func<IClickableMenuButton, ComponentInteractionCreateEventArgs, Task> Callable { get; }
+        public Func<ButtonContext, Task> Callable { get; }
         public string Label { get; set; }
         public ButtonPosition Location { get; set; }
         public ButtonPosition Row { get; set; }
@@ -31,7 +31,7 @@ namespace DSharpPlus.Menus.Entities
 
     internal class StaticMenuButton : IClickableMenuButton
     {
-        public StaticMenuButton(string id, ButtonStyle style, Func<IStyledMenuButton, ComponentInteractionCreateEventArgs, Task> callable, string label,
+        public StaticMenuButton(string id, ButtonStyle style, Func<ButtonContext, Task> callable, string label,
             ButtonPosition location = ButtonPosition.First, ButtonPosition row = ButtonPosition.First, bool disabled = false, DiscordComponentEmoji? emoji = null)
         {
             Id = id;
@@ -46,7 +46,7 @@ namespace DSharpPlus.Menus.Entities
 
         public string Id { get; set; }
         public ButtonStyle Style { get; set; }
-        public Func<IClickableMenuButton, ComponentInteractionCreateEventArgs, Task> Callable { get; }
+        public Func<ButtonContext, Task> Callable { get; }
         public string Label { get; set; }
         public ButtonPosition Location { get; set; }
         public ButtonPosition Row { get; set; }

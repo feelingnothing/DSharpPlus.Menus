@@ -11,7 +11,7 @@ namespace DSharpPlus.Menus.Entities
         {
             if (id.Length > 40) throw new ArgumentException("Id of the menu must 42 characters or less due to serialization behaviour");
             foreach (var (info, attribute) in CollectInteractionMethodsWithAttribute<StaticButtonAttribute>())
-                Buttons.Add(new StaticMenuButton(attribute.Id, attribute.Style, info.CreateDelegate<Func<IStyledMenuButton, ComponentInteractionCreateEventArgs, Task>>(this),
+                Buttons.Add(new StaticMenuButton(attribute.Id, attribute.Style, info.CreateDelegate<Func<ButtonContext, Task>>(this),
                     attribute.Label, attribute.Location, attribute.Row, attribute.Disabled, attribute.Emoji));
         }
 

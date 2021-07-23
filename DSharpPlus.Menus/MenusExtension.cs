@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Menus.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace DSharpPlus.Menus
 {
@@ -53,7 +54,19 @@ namespace DSharpPlus.Menus
             var response = id[(IdPrefix.Length + 1)..].ParseJson<MenuButtonDescriptor>();
             if (response is null || !pendingStaticMenus.TryGetValue(response.MenuId, out var menu)) return Task.CompletedTask;
             if (menu.Buttons.OfType<IClickableMenuButton>().FirstOrDefault(b => b.Id == response.ButtonId) is not { } button) return Task.CompletedTask;
-            return Task.Run(async () => await (await menu.CanBeExecuted(args) ? button.Callable.Invoke(button, args) : Task.CompletedTask));
+            var context = new ButtonContext {Button = button, Interaction = args.Interaction, Message = args.Message};
+            return Task.Run(async () =>
+            {
+                try
+                {
+                    if (await menu.CanBeExecuted(context))
+                        await button.Callable.Invoke(context);
+                }
+                catch (Exception e)
+                {
+                    Client.Logger.LogError(e, "Error while executing button");
+                }
+            });
         }
 
         /// <typeparam name="T">The generic type of static menu you want to get</typeparam>

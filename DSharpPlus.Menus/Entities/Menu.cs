@@ -12,18 +12,18 @@ namespace DSharpPlus.Menus.Entities
         public Menu(DiscordClient client, TimeSpan? timeout = null) : base(client, Guid.NewGuid().ToString(), timeout)
         {
             foreach (var (info, attribute) in CollectInteractionMethodsWithAttribute<ButtonAttribute>())
-                Buttons.Add(new ClickableMenuButton(attribute.Style, info.CreateDelegate<Func<IStyledMenuButton, ComponentInteractionCreateEventArgs, Task>>(this),
+                Buttons.Add(new ClickableMenuButton(attribute.Style, info.CreateDelegate<Func<ButtonContext, Task>>(this),
                     attribute.Label, attribute.Location, attribute.Row, attribute.Disabled, attribute.Emoji));
         }
 
         protected internal async Task LoopAsync()
         {
-            async Task ExecuteButton(IClickableMenuButton button, ComponentInteractionCreateEventArgs args)
+            async Task ExecuteButton(ButtonContext context)
             {
                 try
                 {
-                    if (await CanBeExecuted(args))
-                        await button.Callable.Invoke(button, args);
+                    if (await CanBeExecuted(context))
+                        await context.Button.Callable.Invoke(context);
                 }
                 catch (Exception e)
                 {
@@ -44,13 +44,14 @@ namespace DSharpPlus.Menus.Entities
 
                 var (args, ids) = result.Value;
                 if (Buttons.OfType<IClickableMenuButton>().FirstOrDefault(b => b.Id == ids.ButtonId) is not { } button) return;
+                var context = new ButtonContext {Button = button, Interaction = args.Interaction, Message = args.Message};
                 switch (Extension.Configuration.ButtonButtonCallback)
                 {
                     case MenuButtonCallbackBehaviour.Asynchronous:
-                        _ = Task.Run(async () => await ExecuteButton(button, args));
+                        _ = Task.Run(async () => await ExecuteButton(context));
                         break;
                     case MenuButtonCallbackBehaviour.Synchronous:
-                        await ExecuteButton(button, args);
+                        await ExecuteButton(context);
                         break;
                 }
             }
