@@ -3,7 +3,6 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using DSharpPlus.EventArgs;
 using DSharpPlus.Menus;
 using DSharpPlus.Menus.Attributes;
 using DSharpPlus.Menus.Entities;
@@ -18,12 +17,12 @@ namespace ComplexResponsiveMenu
         }
 
         [StaticSecondaryButton("best_static_button_id", "Create menu")]
-        public async Task SendMenuAsync(IStyledMenuButton button, ComponentInteractionCreateEventArgs args)
+        public async Task SendMenuAsync(ButtonContext context)
         {
-            await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+            await context.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
             var menu = new MyMenu(Client, true);
             await menu.StartAsync();
-            await args.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder()
+            await context.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder()
                 .WithContent("Only for you my guy!").AsEphemeral(true).AddMenu(menu));
         }
     }
@@ -36,10 +35,10 @@ namespace ComplexResponsiveMenu
             this.createdByStatic = createdByStatic;
 
         [SecondaryButton("Are you sure this is menu only for me?")]
-        public async Task ConfirmAsync(IStyledMenuButton button, ComponentInteractionCreateEventArgs args)
+        public async Task ConfirmAsync(ButtonContext context)
         {
-            await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-            await args.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().WithContent(createdByStatic ? "Yes i'm sure." : "No i'm not!").AddMenu(this));
+            await context.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+            await context.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().WithContent(createdByStatic ? "Yes i'm sure." : "No i'm not!").AddMenu(this));
         }
     }
 

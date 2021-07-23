@@ -4,7 +4,6 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using DSharpPlus.EventArgs;
 using DSharpPlus.Menus;
 using DSharpPlus.Menus.Attributes;
 using DSharpPlus.Menus.Entities;
@@ -19,12 +18,12 @@ namespace BasicConfirmationMenuExample
         private ConfirmationMenu(ulong member, DiscordClient client, TimeSpan? timeout = null) : base(client, timeout) =>
             this.member = member;
 
-        public override Task<bool> CanBeExecuted(ComponentInteractionCreateEventArgs args) =>
-            Task.FromResult(args.User.Id == member);
+        public override Task<bool> CanBeExecuted(ButtonContext context) =>
+            Task.FromResult(context.User.Id == member);
 
-        private async Task SetValue(ComponentInteractionCreateEventArgs args, bool value)
+        private async Task SetValue(ButtonContext context, bool value)
         {
-            await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+            await context.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
             Tcs.TrySetResult(value);
             await StopAsync();
         }
@@ -39,10 +38,10 @@ namespace BasicConfirmationMenuExample
         }
 
         [SuccessButton("Confirm")]
-        public async Task ConfirmAsync(IStyledMenuButton button, ComponentInteractionCreateEventArgs args) => await SetValue(args, true);
+        public async Task ConfirmAsync(ButtonContext context) => await SetValue(context, true);
 
         [DangerButton("Deny")]
-        public async Task DenyAsync(IStyledMenuButton button, ComponentInteractionCreateEventArgs args) => await SetValue(args, false);
+        public async Task DenyAsync(ButtonContext context) => await SetValue(context, false);
 
         public override Task StopAsync(bool timeout = false)
         {

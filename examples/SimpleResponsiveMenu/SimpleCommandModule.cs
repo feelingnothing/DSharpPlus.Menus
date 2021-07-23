@@ -3,7 +3,6 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using DSharpPlus.EventArgs;
 using DSharpPlus.Menus;
 using DSharpPlus.Menus.Attributes;
 using DSharpPlus.Menus.Entities;
@@ -30,30 +29,30 @@ namespace SimpleResponsiveMenu
             return base.StopAsync(timeout);
         }
 
-        private async Task Interact(ComponentInteractionCreateEventArgs args, string type)
+        private async Task Interact(ButtonContext context, string type)
         {
-            await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-            logger.LogWarning("{User} just pressed my button, do something!", args.Interaction.User.Username);
-            await args.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().AddMenu(this).WithContent($"It's my {type} button, don't you dare touch it"));
+            await context.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+            logger.LogWarning("{User} just pressed my button, do something!", context.Interaction.User.Username);
+            await context.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().AddMenu(this).WithContent($"It's my {type} button, don't you dare touch it"));
         }
 
         [PrimaryButton("It's my primary button")]
-        public async Task MyPrimaryButtonAsync(ComponentInteractionCreateEventArgs args) => await Interact(args, "primary");
+        public async Task MyPrimaryButtonAsync(ButtonContext context) => await Interact(context, "primary");
 
         [SecondaryButton("It's secondary button")]
-        public async Task MySecondaryButtonAsync(ComponentInteractionCreateEventArgs args) => await Interact(args, "secondary");
+        public async Task MySecondaryButtonAsync(ButtonContext context) => await Interact(context, "secondary");
 
         [DangerButton("It's my danger button", row: ButtonPosition.Second)]
-        public async Task MyDangerButtonAsync(ComponentInteractionCreateEventArgs args) => await Interact(args, "danger");
+        public async Task MyDangerButtonAsync(ButtonContext context) => await Interact(context, "danger");
 
         [SuccessButton("It's my success button", row: ButtonPosition.Second)]
-        public async Task MySuccessButtonAsync(ComponentInteractionCreateEventArgs args) => await Interact(args, "success");
+        public async Task MySuccessButtonAsync(ButtonContext context) => await Interact(context, "success");
 
         [SecondaryButton("Don't forget to create a close button", row: ButtonPosition.Third)]
-        public async Task CloseAsync(ComponentInteractionCreateEventArgs args)
+        public async Task CloseAsync(ButtonContext context)
         {
-            await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-            await args.Interaction.DeleteOriginalResponseAsync();
+            await context.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+            await context.Interaction.DeleteOriginalResponseAsync();
             await StopAsync();
         }
     }
