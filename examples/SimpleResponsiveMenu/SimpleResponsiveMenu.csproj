@@ -3,12 +3,13 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <OutputType>Exe</OutputType>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="DSharpPlus" Version="4.1.0-nightly-00924" />
       <PackageReference Include="DSharpPlus.CommandsNext" Version="4.1.0-nightly-00924" />
-      <PackageReference Include="DSharpPlus.Menus" Version="1.0.2.8" />
+      <PackageReference Include="DSharpPlus.Menus" Version="1.0.3" />
     </ItemGroup>
 
 </Project>

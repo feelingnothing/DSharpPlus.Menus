@@ -9,7 +9,7 @@ namespace SimpleResponsiveMenu
 {
     public static class Startup
     {
-        private static readonly string Token = Environment.GetEnvironmentVariable("TOKEN");
+        private static readonly string Token = Environment.GetEnvironmentVariable("TOKEN")!;
         private static readonly string[] Prefixes = {".", "~", "\\"};
 
         public static async Task Main()

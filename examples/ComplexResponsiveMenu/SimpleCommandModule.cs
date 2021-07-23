@@ -12,13 +12,13 @@ namespace ComplexResponsiveMenu
 {
     public class MyStaticMenu : StaticMenu
     {
-        // Any static id must be is 42 letters or less
+        // Any static id must be is 40 letters or less
         public MyStaticMenu(DiscordClient client) : base("best_static_menu_id", client)
         {
         }
 
         [StaticSecondaryButton("best_static_button_id", "Create menu")]
-        public async Task SendMenuAsync(ComponentInteractionCreateEventArgs args)
+        public async Task SendMenuAsync(IStyledMenuButton button, ComponentInteractionCreateEventArgs args)
         {
             await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
             var menu = new MyMenu(Client, true);
@@ -36,7 +36,7 @@ namespace ComplexResponsiveMenu
             this.createdByStatic = createdByStatic;
 
         [SecondaryButton("Are you sure this is menu only for me?")]
-        public async Task ConfirmAsync(ComponentInteractionCreateEventArgs args)
+        public async Task ConfirmAsync(IStyledMenuButton button, ComponentInteractionCreateEventArgs args)
         {
             await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
             await args.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().WithContent(createdByStatic ? "Yes i'm sure." : "No i'm not!").AddMenu(this));

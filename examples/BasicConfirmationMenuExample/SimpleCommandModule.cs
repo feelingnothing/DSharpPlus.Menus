@@ -39,10 +39,10 @@ namespace BasicConfirmationMenuExample
         }
 
         [SuccessButton("Confirm")]
-        public async Task ConfirmAsync(ComponentInteractionCreateEventArgs args) => await SetValue(args, true);
+        public async Task ConfirmAsync(IStyledMenuButton button, ComponentInteractionCreateEventArgs args) => await SetValue(args, true);
 
         [DangerButton("Deny")]
-        public async Task DenyAsync(ComponentInteractionCreateEventArgs args) => await SetValue(args, false);
+        public async Task DenyAsync(IStyledMenuButton button, ComponentInteractionCreateEventArgs args) => await SetValue(args, false);
 
         public override Task StopAsync(bool timeout = false)
         {
