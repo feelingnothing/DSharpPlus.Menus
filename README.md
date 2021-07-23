@@ -2,7 +2,7 @@
 
 [![Nuget](https://img.shields.io/nuget/vpre/DSharpPlus.Menus?style=flat-square)](https://www.nuget.org/packages/IDoEverything.DSharpPlus.SlashCommands)
 
-An extension to make interaction easier.
+An extension to make interactions easier.
 
 #### This is not official DSharpPlus extension and most probably will never be, use it on your own risk
 
