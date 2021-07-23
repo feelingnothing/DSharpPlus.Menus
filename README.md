@@ -34,11 +34,11 @@ class MyMenu : Menu
     // For this button to be registered it must have one of the button attributes,
     // have `ComponentInteractionCreateEventArgs` as first and only parameter and return `Task`
     [SuccessButton("It is a success button")]
-    public async Task SuccessAsync(IStyledMenuButton button, ComponentInteractionCreateEventArgs args)
+    public async Task SuccessAsync(ButtonContext ctx)
     {
-        await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+        await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
         // Do not forget to add menu to the edited message or buttons won't show up
-        await args.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().AddMenu(this).WithContent($"Your name is {args.User.Username} and id {args.User.Id}!"));
+        await ctx.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().AddMenu(this).WithContent($"Your name is {args.User.Username} and id {args.User.Id}!"));
     }
 ```
 
@@ -77,13 +77,13 @@ class MyStaticMenu : StaticMenu
     
     // Static menus have their own buttons attributes, do not use regular ones, menu would not recognize them
     [StaticSecondaryButton("LimitIs40Charachers", "Click to create a menu only for you")]
-    public async Task CreateEphemeralMenuAsync(IStyledMenuButton button, ComponentInteractionCreateEventArgs args)
+    public async Task CreateEphemeralMenuAsync(ButtonContext ctx)
     {
-        await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+        await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
         var menu = new MyMenu(Client);
         // Start then send!
         await menu.StartAsync();
-        await args.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder()
+        await ctx.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder()
                     .AddMenu(this).AsEphemeral(true).WithContent("A menu only for you!"));
     }
     
