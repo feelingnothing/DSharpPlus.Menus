@@ -34,7 +34,7 @@ class MyMenu : Menu
     // For this button to be registered it must have one of the button attributes,
     // have `ComponentInteractionCreateEventArgs` as first and only parameter and return `Task`
     [SuccessButton("It is a success button")]
-    public async Task SuccessAsync(ComponentInteractionCreateEventArgs args)
+    public async Task SuccessAsync(IStyledMenuButton button, ComponentInteractionCreateEventArgs args)
     {
         await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
         // Do not forget to add menu to the edited message or buttons won't show up
@@ -77,7 +77,7 @@ class MyStaticMenu : StaticMenu
     
     // Static menus have their own buttons attributes, do not use regular ones, menu would not recognize them
     [StaticSecondaryButton("LimitIs40Charachers", "Click to create a menu only for you")]
-    public async Task CreateEphemeralMenuAsync(ComponentInteractionCreateEventArgs args)
+    public async Task CreateEphemeralMenuAsync(IStyledMenuButton button, ComponentInteractionCreateEventArgs args)
     {
         await args.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
         var menu = new MyMenu(Client);
