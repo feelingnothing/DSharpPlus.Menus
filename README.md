@@ -22,7 +22,7 @@ to your `DiscordClient` instance and you are ready to go
 
 ### Regular Menus
 
-To use simple auto-generated menus use provided `Menus.Entities.Menu` class
+To use simple auto-generated menus use provided `Menu` class
 
 ```c#
 class MyMenu : Menu
@@ -71,7 +71,7 @@ To start using it you need first of all create a static menu class with `Menus.I
 class MyStaticMenu : StaticMenu
 {
     // Important note that maximum length of the menu id and button id is 40 or less!
-    public MyStaticMenu(DiscordClient client) : base("maximumLengthOfTheCustomIdIs40Characters", clisnt)
+    public MyStaticMenu(DiscordClient client) : base("maximumLengthOfTheCustomIdIs40Characters", client)
     {
     }
     
