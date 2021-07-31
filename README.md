@@ -31,15 +31,20 @@ class MyMenu : Menu
     {
     }
 
-    // For this button to be registered it must have one of the button attributes,
-    // have `ComponentInteractionCreateEventArgs` as first and only parameter and return `Task`
-    [SuccessButton("It is a success button")]
-    public async Task SuccessAsync(ButtonContext ctx)
+    private async Task Interact(ButtonContext ctx)
     {
         await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
         // Do not forget to add menu to the edited message or buttons won't show up
         await ctx.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().AddMenu(this).WithContent($"Your name is {args.User.Username} and id {args.User.Id}!"));
     }
+
+    // For this button to be registered it must have one of the button attributes,
+    // have `ComponentInteractionCreateEventArgs` as first and only parameter and return `Task`
+    [SuccessButton("It is a success button")]
+    public async Task SuccessAsync(ButtonContext ctx) => await Interact(ctx);
+
+    [DangerButton("It is a danger button", Row = ButtonPosition.Second)]
+    public async Task DangerAsync(ButtonContext ctx) => await Interact(ctx);
 ```
 
 To see the list of the button attributes go to `\examples\` folder  
