@@ -42,13 +42,13 @@ namespace SimpleResponsiveMenu
         [SecondaryButton("It's secondary button")]
         public async Task MySecondaryButtonAsync(ButtonContext context) => await Interact(context, "secondary");
 
-        [DangerButton("It's my danger button", row: ButtonPosition.Second)]
+        [DangerButton("It's my danger button", Row = ButtonPosition.Second)]
         public async Task MyDangerButtonAsync(ButtonContext context) => await Interact(context, "danger");
 
-        [SuccessButton("It's my success button", row: ButtonPosition.Second)]
+        [SuccessButton("It's my success button", Row = ButtonPosition.Second)]
         public async Task MySuccessButtonAsync(ButtonContext context) => await Interact(context, "success");
 
-        [SecondaryButton("Don't forget to create a close button", row: ButtonPosition.Third)]
+        [SecondaryButton("Don't forget to create a close button", Row = ButtonPosition.Third)]
         public async Task CloseAsync(ButtonContext context)
         {
             await context.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
