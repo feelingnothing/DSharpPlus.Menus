@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using DSharpPlus.EventArgs;
 using DSharpPlus.Menus.Attributes;
 using Microsoft.Extensions.Logging;
 

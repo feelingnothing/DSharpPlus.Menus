@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
-using DSharpPlus.EventArgs;
 
 namespace DSharpPlus.Menus.Entities
 {

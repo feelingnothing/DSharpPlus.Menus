@@ -54,27 +54,19 @@ namespace DSharpPlus.Menus.Entities
 
         internal IEnumerable<DiscordActionRowComponent> Serialize()
         {
-            var serialized = new List<DiscordActionRowComponent>();
-            foreach (var group in Buttons.GroupBy(b => b.Row))
+            return Buttons.GroupBy(b => b.Row).Select(group =>
             {
-                foreach (var button in group.OrderBy(b => b.Location))
+                return new DiscordActionRowComponent(group.Select(button =>
                 {
-                    var row = new List<DiscordComponent>();
-                    switch (button)
+                    DiscordComponent component = button switch
                     {
-                        case IClickableMenuButton c:
-                            row.Add(new DiscordButtonComponent(c.Style, this.SerializeButton(c), c.Label, c.Disabled, c.Emoji));
-                            break;
-                        case ILinkMenuButton l:
-                            row.Add(new DiscordLinkButtonComponent(l.Url.ToString(), l.Label, l.Disabled, l.Emoji));
-                            break;
-                    }
-
-                    serialized.Add(new DiscordActionRowComponent(row));
-                }
-            }
-
-            return serialized;
+                        IClickableMenuButton c => new DiscordButtonComponent(c.Style, this.SerializeButton(c), c.Label, c.Disabled, c.Emoji),
+                        ILinkMenuButton l => new DiscordLinkButtonComponent(l.Url.ToString(), l.Label, l.Disabled, l.Emoji),
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+                    return component;
+                }));
+            });
         }
 
         public virtual Task<bool> CanBeExecuted(ButtonContext args) => Task.FromResult(true);
