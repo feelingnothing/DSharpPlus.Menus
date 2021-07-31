@@ -6,24 +6,20 @@ namespace DSharpPlus.Menus.Attributes
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class BaseButtonAttribute : Attribute
     {
-        public virtual string? Id { get; }
+        public string Id { get; }
         public ButtonStyle Style { get; }
         public string Label { get; }
-        public ButtonPosition Location { get; }
-        public ButtonPosition Row { get; }
-        public DiscordComponentEmoji? Emoji { get; }
-        public bool Disabled { get; }
+        public ButtonPosition Location { get; init; } = ButtonPosition.First;
+        public ButtonPosition Row { get; init; } = ButtonPosition.First;
+        public DiscordComponentEmoji? Emoji { get; init; } = null;
+        public bool Disabled { get; init; } = false;
 
-        protected internal BaseButtonAttribute(ButtonStyle style, string label, ButtonPosition location = ButtonPosition.First, ButtonPosition row = ButtonPosition.First, bool disabled = false, string? id = null, string? emoji = null)
+        protected internal BaseButtonAttribute(ButtonStyle style, string label, string? id = null)
         {
             if (id?.Length > 42) throw new ArgumentException("Id of the button must be maximum of 32 characters");
-            Id = id;
+            Id = id ?? Guid.NewGuid().ToString();
             Style = style;
             Label = label;
-            Location = location;
-            Row = row;
-            Emoji = emoji != null ? new DiscordComponentEmoji(emoji) : null;
-            Disabled = disabled;
         }
     }
 }
