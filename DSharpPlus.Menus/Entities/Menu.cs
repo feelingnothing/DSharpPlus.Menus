@@ -33,7 +33,7 @@ namespace DSharpPlus.Menus.Entities
             Status = MenuStatus.Started;
             while (!TokenSource.IsCancellationRequested)
             {
-                var result = await Extension.WaitForMenuButton(this, TokenSource.Token);
+                var result = await Extension.WaitForMenuButton(this, TimeOutSpan);
                 if (result is null)
                 {
                     // Timed out
