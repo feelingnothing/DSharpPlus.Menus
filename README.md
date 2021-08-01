@@ -6,6 +6,8 @@ An extension to make interactions easier.
 
 #### This is not official DSharpPlus extension and most probably will never be, use it on your own risk
 
+If you have encountered menu timeout issue please update to version `1.0.3.4` or higher 
+
 DSharpPlus interaction wrapper allows you to create a classes with multiple interactive buttons  
 For now this library exists just to comfort my requirements, but with more commits I'm making - the more I see this extension used in everyone's projects, it is so easy to use and fits a in
 a lot of projects
