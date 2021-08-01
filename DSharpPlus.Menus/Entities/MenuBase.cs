@@ -54,9 +54,9 @@ namespace DSharpPlus.Menus.Entities
 
         internal IEnumerable<DiscordActionRowComponent> Serialize()
         {
-            return Buttons.GroupBy(b => b.Row).Select(group =>
+            return Buttons.GroupBy(b => b.Row).OrderBy(g => g.Key).Select(group =>
             {
-                return new DiscordActionRowComponent(group.Select(button =>
+                return new DiscordActionRowComponent(group.OrderBy(g => g.Location).Select(button =>
                 {
                     DiscordComponent component = button switch
                     {
