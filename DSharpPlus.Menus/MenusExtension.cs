@@ -54,7 +54,7 @@ namespace DSharpPlus.Menus
             var response = id[(IdPrefix.Length + 1)..].ParseJson<MenuButtonDescriptor>();
             if (response is null || !pendingStaticMenus.TryGetValue(response.MenuId, out var menu)) return Task.CompletedTask;
             if (menu.Buttons.OfType<IClickableMenuButton>().FirstOrDefault(b => b.Id == response.ButtonId) is not { } button) return Task.CompletedTask;
-            var context = new ButtonContext {Button = button, Interaction = args.Interaction, Message = args.Message};
+            var context = new ButtonContext(args.Interaction, button, args.Message, sender);
             return Task.Run(async () =>
             {
                 try

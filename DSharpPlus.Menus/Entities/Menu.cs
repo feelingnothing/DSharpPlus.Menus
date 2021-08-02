@@ -43,7 +43,7 @@ namespace DSharpPlus.Menus.Entities
 
                 var (args, ids) = result.Value;
                 if (Buttons.OfType<IClickableMenuButton>().FirstOrDefault(b => b.Id == ids.ButtonId) is not { } button) return;
-                var context = new ButtonContext {Button = button, Interaction = args.Interaction, Message = args.Message};
+                var context = new ButtonContext(args.Interaction, button, args.Message, Client);
                 switch (Extension.Configuration.ButtonButtonCallback)
                 {
                     case MenuButtonCallbackBehaviour.Asynchronous:
