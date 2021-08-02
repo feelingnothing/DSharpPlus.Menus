@@ -16,7 +16,7 @@ namespace DSharpPlus.Menus.Attributes
 
         protected internal BaseButtonAttribute(ButtonStyle style, string label, string? id = null)
         {
-            if (id?.Length > 42) throw new ArgumentException("Id of the button must be maximum of 32 characters");
+            if (id?.Length > 40) throw new ArgumentException("Id of the button must be maximum of 40 characters");
             Id = id ?? Guid.NewGuid().ToString();
             Style = style;
             Label = label;
