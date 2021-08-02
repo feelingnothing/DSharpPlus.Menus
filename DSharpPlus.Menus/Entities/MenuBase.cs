@@ -40,7 +40,7 @@ namespace DSharpPlus.Menus.Entities
 
         protected internal IEnumerable<(MethodInfo, T)> CollectInteractionMethodsWithAttribute<T>() where T : BaseButtonAttribute
         {
-            return GetType().GetMethods().Select<MethodInfo, (MethodInfo, T)?>(m =>
+            return GetType().GetMethods().Reverse().Select<MethodInfo, (MethodInfo, T)?>(m =>
             {
                 if (!m.IsPublic || m.IsStatic || m.IsAbstract) return null;
                 var parameters = m.GetParameters();
