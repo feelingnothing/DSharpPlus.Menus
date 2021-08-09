@@ -38,7 +38,9 @@ namespace DSharpPlus.Menus
             var token = new CancellationTokenSource(timeout ?? Configuration.DefaultMenuTimeout).Token;
             var result = await componentEventWaiter
                 .WaitForMatchAsync(new ComponentMatchRequest(menu.Id,
-                    (_, d) => menu.Buttons.OfType<IClickableMenuButton>().Any(b => b.Id == d.ButtonId), token))
+                    (a, d) => 
+                        a.Interaction.Data.ComponentType == ComponentType.Button
+                        && menu.Buttons.OfType<IClickableMenuButton>().Any(b => b.Id == d.ButtonId), token))
                 .ConfigureAwait(false);
             return result;
         }
