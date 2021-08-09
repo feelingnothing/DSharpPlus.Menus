@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
-using DSharpPlus.Menus.Attributes;
 
 // Thanks to Velvet for this peace of code, without him i would not know how TaskCompletionSource works and even existed
 // https://github.com/VelvetThePanda
